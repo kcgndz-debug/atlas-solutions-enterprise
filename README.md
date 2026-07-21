@@ -1,19 +1,21 @@
-# ATLAS Enterprise Cloud v1.1
+# ATLAS Enterprise Cloud v1.2
 
-## Fixes in this release
-- Connects explicitly to the Firestore database named `default`
-- Removes the pre-bootstrap Firestore read that caused Safari to report the client as offline
-- Forces Safari to download the new app code instead of an older service-worker cache
-- Creates AES, Delamere Industries, and HDAV workspaces with the first owner
-- Makes AES the owner's starting workspace
-- Includes secure Firestore rules for use immediately after owner creation
+## Fix
+Atlas now accepts the exact Firebase Config snippet copied from Firebase Console:
+- comments are allowed
+- `const firebaseConfig =` is allowed
+- unquoted JavaScript field names are allowed
+- the ending semicolon is allowed
 
-## Phone update steps
-1. Upload all files in this folder to the root of the GitHub repository.
-2. Replace files when GitHub asks.
-3. Commit directly to `main`.
-4. Wait for Netlify to show the latest deploy as Published.
-5. Close every Atlas browser tab.
-6. Reopen `https://atlas-solutions-enterprise.netlify.app/?v=1.1.0`.
-7. Tap Owner Setup and create the first owner.
-8. After the owner opens the dashboard, copy `firestore.rules` into Firebase Firestore > Security > Edit rules and publish it.
+The update clears the damaged saved Firebase configuration once and asks for a fresh copy.
+
+## Deploy
+1. Upload every file in this folder to the GitHub repository root.
+2. Commit directly to `main`.
+3. Wait for Netlify to publish.
+4. Close all Atlas tabs.
+5. Open `https://atlas-solutions-enterprise.netlify.app/?v=1.2.0`
+6. In Firebase: Project settings > General > Your apps > Atlas Enterprise Web > Config.
+7. Tap Firebase's copy button.
+8. Paste the entire copied snippet into Atlas without editing.
+9. Tap Connect Atlas, then create the owner.
