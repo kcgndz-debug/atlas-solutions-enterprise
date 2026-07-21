@@ -1,13 +1,15 @@
-# ATLAS Enterprise Cloud v1
+# ATLAS Enterprise V2.1.1 — Black Screen Hotfix
 
-## Deployment
-1. Upload all files to the root of the `atlas-solutions-enterprise` GitHub repository.
-2. Netlify will deploy automatically.
-3. In Firebase: Firestore > Security > Rules. Paste the contents of `firestore.rules` and publish.
-4. Open the Netlify URL. Paste your Firebase configuration JSON.
-5. Use **Owner Setup** once to create the first owner account.
+Fixes:
+- Prevents a missing page control from stopping application startup.
+- Adds a visible startup error page instead of a blank black screen.
+- Removes fragile inline customer-mode handlers.
+- Adds missing tax and equipment-contingency controls.
+- Forces a fresh service-worker cache.
+- Preserves the V2.1 existing/new customer workflow.
 
-## Included
-Firebase authentication, first-owner bootstrap, company workspaces, Delamere starter database, customers, estimates, offline Firestore persistence, PWA installation, Netlify configuration, and production Firestore rules.
-
-Storage and cloud file uploads remain disabled until billing is enabled.
+Deployment:
+1. Upload every file to the GitHub repository root and replace the old files.
+2. Commit directly to main.
+3. Wait for Netlify to show Published.
+4. Open https://atlas-solutions-enterprise.netlify.app/?v=2.1.1 in Safari.
