@@ -1,14 +1,19 @@
-# ATLAS Enterprise v1.4 — Estimating Engine
+# ATLAS Enterprise v2.0 — Estimating Engine
 
-Adds the expanded Atlas/May-sheet rail library and estimating workflow:
-- Materials-only and furnish-and-install modes
-- Labor, mileage, hotel, travel half-days
-- Hoops, posts, grab rail, powder coat, equipment
-- Field verification tiers
-- Shop drawings
-- Materials-only tax rules
-- Profit added last
-- Final quote based on rounded whole-dollar rate per LF
+Major changes:
+- Firebase connection is preserved during upgrades.
+- Fixed project-state loading.
+- Expanded rail, fence and gate operational library.
+- Project selection auto-fills customer and location.
+- May-sheet workflow is shown as a detailed live breakdown.
+- Profit is added after base costs and adders.
+- Final recommended LF rate is rounded to a whole dollar.
+- Materials-only sales tax is editable and shop drawings are excluded from taxable material.
+- Optional 30% equipment contingency.
+- Printable proposal includes company, scope and estimate breakdown.
 
-Upload all files to the GitHub repository root and commit to main.
-Open https://atlas-solutions-enterprise.netlify.app/?v=1.4.0 after Netlify publishes.
+Deploy:
+1. Upload every file in this folder to the repository root.
+2. Commit to main.
+3. Wait for Netlify to publish.
+4. Open the site with ?v=2.0.0 once to refresh the offline cache.

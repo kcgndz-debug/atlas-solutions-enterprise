@@ -1,14 +1,14 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>ATLAS Enterprise</title><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="styles.css?v=1.4.0"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>ATLAS Enterprise</title><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="styles.css?v=2.0.0"></head><body>
 <div id="offline" class="offline hidden">Offline — work is saved and will sync later</div>
 <section id="configScreen" class="screen center hidden"><div class="card auth"><img src="atlas-logo.jpg" class="logo"><h1>Connect Firebase</h1><p>Paste the Firebase configuration object from the Firebase console.</p><textarea id="config" rows="12" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea><button id="saveConfig" class="primary">Connect Atlas</button><p id="configError" class="error"></p></div></section>
 <section id="authScreen" class="screen center hidden"><div class="card auth"><img src="atlas-logo.jpg" class="logo"><h1>ATLAS Enterprise</h1><p>Construction Operations Platform</p><div class="tabs"><button id="signInTab" class="active">Sign In</button><button id="ownerTab">Owner Setup</button></div><form id="signIn"><label>Email<input id="email" type="email" required></label><label>Password<input id="password" type="password" required></label><button class="primary">Sign In</button></form><form id="ownerSetup" class="hidden"><label>Name<input id="ownerName" value="Kendall" required></label><label>Email<input id="ownerEmail" type="email" required></label><label>Password<input id="ownerPassword" type="password" minlength="8" required></label><button class="primary">Create First Owner</button></form><p id="authError" class="error"></p><button id="changeConfig" class="link">Change Firebase connection</button></div></section>
-<section id="app" class="hidden"><header><div class="brand"><img src="icon-192.png"><div><b>ATLAS</b><span>Enterprise</span></div></div><div><span id="sync" class="badge">Online</span><button id="logout">Log out</button></div></header><div class="shell"><aside><div class="profile"><b id="profileName"></b><span id="profileRole"></span></div><label>Workspace<select id="workspace"></select></label><nav><button data-view="dashboard" class="nav active">Dashboard</button><button data-view="estimate" class="nav">New Estimate</button><button data-view="estimates" class="nav">Estimates</button><button data-view="customers" class="nav">Customers</button><button data-view="pricing" class="nav">Pricing</button><button data-view="companies" class="nav owner">Companies</button></nav></aside><main>
-<section id="dashboard" class="view"><div class="pagehead"><div><h2>Dashboard</h2><p id="welcome"></p></div><button class="primary newEstimate">+ New Estimate</button></div><div class="kpis"><div><span>Estimates</span><b id="estimateCount">0</b></div><div><span>Customers</span><b id="customerCount">0</b></div><div><span>Open Quotes</span><b id="openCount">0</b></div><div><span>Workspace</span><b id="companyName">—</b></div></div><div class="panel"><h3>Recent Estimates</h3><div id="recent"></div></div></section>
+<section id="app" class="hidden"><header><div class="brand"><img src="icon-192.png"><div><b>ATLAS</b><span>Enterprise</span></div></div><div><span id="sync" class="badge">Online</span><button id="logout">Log out</button></div></header><div class="shell"><aside><div class="profile"><b id="profileName"></b><span id="profileRole"></span></div><label>Workspace<select id="workspace"></select></label><nav><button data-view="dashboard" class="nav active">Dashboard</button><button data-view="estimate" class="nav">New Estimate</button><button data-view="estimates" class="nav">Estimates</button><button data-view="projects" class="nav">Projects</button><button data-view="customers" class="nav">Customers</button><button data-view="pricing" class="nav">Pricing</button><button data-view="companies" class="nav owner">Companies</button></nav></aside><main>
+<section id="dashboard" class="view"><div class="pagehead"><div><h2>Dashboard</h2><p id="welcome"></p></div><button class="primary newEstimate">+ New Estimate</button></div><div class="kpis"><div><span>Estimates</span><b id="estimateCount">0</b></div><div><span>Customers</span><b id="customerCount">0</b></div><div><span>Projects</span><b id="projectCount">0</b></div><div><span>Open Quotes</span><b id="openCount">0</b></div><div><span>Workspace</span><b id="companyName">—</b></div></div><div class="panel"><h3>Recent Estimates</h3><div id="recent"></div></div></section>
 <section id="estimate" class="view hidden">
-<div class="pagehead"><div><h2>Atlas Estimate Builder</h2><p>May-sheet workflow: base and adders first, profit last, final whole-dollar rate.</p></div></div>
+<div class="pagehead"><div><h2>Atlas Estimate Builder</h2><p>May-sheet workflow: base and adders first, profit last, final whole-dollar rate.</p></div><div class="quote-chip">Last Quote: <b id="lastQuoteNumber">—</b></div></div>
 <form id="estimateForm" class="panel grid">
-<label>Customer<input id="estCustomer" required></label>
-<label>Project<input id="estProject" required></label>
+<label>Customer<select id="estCustomer" required><option value="">Select customer</option></select></label>
+<label>Project<select id="estProject" required><option value="">Select project</option></select></label>
 <label>Location<input id="estLocation"></label>
 <label>Quote Type<select id="quoteMode"><option value="install">Furnish & Install</option><option value="material">Materials Only</option></select></label>
 <label class="full">Rail / Fence Type<select id="estType"></select></label>
@@ -53,18 +53,37 @@
 <div class="full actions"><button class="primary">Save Estimate</button><button type="button" id="print">Print / PDF</button></div>
 </form></section>
 <section id="estimates" class="view hidden"><div class="pagehead"><h2>Estimates</h2><button class="primary newEstimate">+ New Estimate</button></div><div id="estimateList" class="panel"></div></section>
+
+<section id="projects" class="view hidden">
+<div class="pagehead"><div><h2>Projects</h2><p>Company-scoped project records and estimating history.</p></div><button class="primary newProject">+ New Project</button></div>
+<form id="projectForm" class="panel grid">
+<label>Project Name<input id="projectName" required></label>
+<label>Customer<input id="projectCustomer" required></label>
+<label>Project Number<input id="projectNumber"></label>
+<label>Location<input id="projectLocation"></label>
+<label>Status<select id="projectStatus"><option>Active</option><option>Bidding</option><option>Awarded</option><option>On Hold</option><option>Complete</option></select></label>
+<label class="full">Notes<textarea id="projectNotes" rows="3"></textarea></label>
+<div class="full"><button class="primary">Save Project</button></div>
+</form>
+<div id="projectList" class="panel"></div>
+</section>
 <section id="customers" class="view hidden"><h2>Customers</h2><form id="customerForm" class="panel inline"><input id="custName" placeholder="Customer/company" required><input id="custContact" placeholder="Contact"><input id="custEmail" type="email" placeholder="Email"><button class="primary">Add Customer</button></form><div id="customerList" class="panel"></div></section>
 <section id="pricing" class="view hidden"><h2>Pricing Database</h2><div class="panel table"><table><thead><tr><th>Code</th><th>Description</th><th>Material</th><th>Base/LF</th><th>Production</th><th>Hoop</th><th>Pricing Note</th></tr></thead><tbody id="pricingRows"></tbody></table></div></section>
 <section id="companies" class="view hidden"><h2>Companies</h2><form id="companyForm" class="panel inline"><input id="newCompany" placeholder="Company name" required><button class="primary">Add Company</button></form><div id="companyList" class="panel"></div></section>
-</main></div></section><div id="toast" class="toast hidden"></div>
-<script>
-(function(){
-  const targetVersion='1.4.0';
-  if(localStorage.getItem('atlas_app_version')!==targetVersion){
-    localStorage.removeItem('atlasFirebaseConfig');
-    localStorage.setItem('atlas_app_version',targetVersion);
-  }
-})();
-</script>
-
-<script type="module" src="atlas-v1-4.js?v=1.4.0"></script></body></html>
+</main></div></section>
+<section id="printProposal" class="print-only">
+<div class="proposal-head"><img src="atlas-logo.jpg"><div><h1>ATLAS Enterprise</h1><p>Construction Operations Proposal</p></div></div>
+<div class="proposal-meta">
+<div><span>Company</span><b id="printCompany"></b></div><div><span>Quote</span><b id="printQuoteNumber"></b></div>
+<div><span>Customer</span><b id="printCustomer"></b></div>
+<div><span>Project</span><b id="printProject"></b></div>
+<div><span>Location</span><b id="printLocation"></b></div>
+</div>
+<div class="proposal-scope"><h2>Scope</h2><p id="printScope"></p></div>
+<table class="proposal-breakdown"><thead><tr><th>Estimate Breakdown</th><th>Amount</th></tr></thead><tbody id="printBreakdown"></tbody></table><div class="proposal-total"><div><span>Recommended Rate</span><b id="printRate"></b></div><div><span>Total Proposal</span><b id="printTotal"></b></div></div>
+<div><h3>Notes</h3><p id="printNotes"></p></div>
+<footer>ATLAS Enterprise Solutions</footer>
+</section>
+<div id="toast" class="toast hidden"></div>
+<script>localStorage.setItem("atlas_app_version","2.0.0");</script>
+<script type="module" src="atlas-v2-0.js?v=2.0.0"></script></body></html>

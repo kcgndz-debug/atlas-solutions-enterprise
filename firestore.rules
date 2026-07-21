@@ -51,6 +51,16 @@ service cloud.firestore {
       allow update, delete: if isOwner();
     }
 
+
+    match /projects/{id} {
+      allow create: if belongsTo(request.resource.data.companyId);
+      allow read, update, delete: if belongsTo(resource.data.companyId);
+    }
+
+    match /counters/{id} {
+      allow read, write: if isOwner();
+    }
+
     match /customers/{id} {
       allow create: if belongsTo(request.resource.data.companyId);
       allow read, update, delete: if belongsTo(resource.data.companyId);
