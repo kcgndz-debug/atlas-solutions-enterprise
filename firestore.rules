@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore { match /databases/{database}/documents {
+ function signed(){return request.auth!=null;}
+ function me(){return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;}
+ function owner(){return signed()&&me().role=='owner'&&me().active==true;}
+ function member(cid){return signed()&&me().active==true&&(me().role=='owner'||cid in me().companyIds);}
+ match /system/bootstrap {allow read:if true;allow create:if signed()&&!exists(/databases/$(database)/documents/system/bootstrap)&&request.resource.data.ownerUid==request.auth.uid;allow update,delete:if false;}
+ match /users/{uid}{allow create:if signed()&&request.auth.uid==uid&&!exists(/databases/$(database)/documents/system/bootstrap)&&request.resource.data.role=='owner';allow read,update:if signed()&&(request.auth.uid==uid||owner());allow delete:if owner();}
+ match /companies/{cid}{allow read:if member(cid);allow create:if owner() || (signed() && !exists(/databases/$(database)/documents/system/bootstrap) && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner');allow update,delete:if owner();}
+ match /estimates/{id}{allow create:if member(request.resource.data.companyId);allow read,update,delete:if member(resource.data.companyId);}
+ match /customers/{id}{allow create:if member(request.resource.data.companyId);allow read,update,delete:if member(resource.data.companyId);}
+}}
