@@ -1,9 +1,14 @@
-# ATLAS Enterprise v1.3
+# ATLAS Enterprise v1.4 — Estimating Engine
 
-Cache-proof update:
-- accepts Firebase's exact copied Config snippet
-- uses a brand-new JS filename so Safari cannot reuse the old parser
+Adds the expanded Atlas/May-sheet rail library and estimating workflow:
+- Materials-only and furnish-and-install modes
+- Labor, mileage, hotel, travel half-days
+- Hoops, posts, grab rail, powder coat, equipment
+- Field verification tiers
+- Shop drawings
+- Materials-only tax rules
+- Profit added last
+- Final quote based on rounded whole-dollar rate per LF
 
-Upload all files to GitHub, then delete the old app.js file from the repository.
-Open:
-https://atlas-solutions-enterprise.netlify.app/?v=1.3.0
+Upload all files to the GitHub repository root and commit to main.
+Open https://atlas-solutions-enterprise.netlify.app/?v=1.4.0 after Netlify publishes.
