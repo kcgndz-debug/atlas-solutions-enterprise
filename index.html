@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>ATLAS Enterprise</title><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="styles.css?v=1.2.0"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>ATLAS Enterprise</title><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="styles.css?v=1.3.0"></head><body>
 <div id="offline" class="offline hidden">Offline — work is saved and will sync later</div>
 <section id="configScreen" class="screen center hidden"><div class="card auth"><img src="atlas-logo.jpg" class="logo"><h1>Connect Firebase</h1><p>Paste the Firebase configuration object from the Firebase console.</p><textarea id="config" rows="12" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea><button id="saveConfig" class="primary">Connect Atlas</button><p id="configError" class="error"></p></div></section>
 <section id="authScreen" class="screen center hidden"><div class="card auth"><img src="atlas-logo.jpg" class="logo"><h1>ATLAS Enterprise</h1><p>Construction Operations Platform</p><div class="tabs"><button id="signInTab" class="active">Sign In</button><button id="ownerTab">Owner Setup</button></div><form id="signIn"><label>Email<input id="email" type="email" required></label><label>Password<input id="password" type="password" required></label><button class="primary">Sign In</button></form><form id="ownerSetup" class="hidden"><label>Name<input id="ownerName" value="Kendall" required></label><label>Email<input id="ownerEmail" type="email" required></label><label>Password<input id="ownerPassword" type="password" minlength="8" required></label><button class="primary">Create First Owner</button></form><p id="authError" class="error"></p><button id="changeConfig" class="link">Change Firebase connection</button></div></section>
@@ -12,12 +12,12 @@
 </main></div></section><div id="toast" class="toast hidden"></div>
 <script>
 (function(){
-  const targetVersion='1.2.0';
+  const targetVersion='1.3.0';
   if(localStorage.getItem('atlas_app_version')!==targetVersion){
-    localStorage.removeItem('atlas_firebase_config_v1');
+    localStorage.removeItem('atlasFirebaseConfig');
     localStorage.setItem('atlas_app_version',targetVersion);
   }
 })();
 </script>
 
-<script type="module" src="app.js?v=1.2.0"></script></body></html>
+<script type="module" src="atlas-v1-3.js?v=1.3.0"></script></body></html>
