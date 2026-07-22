@@ -1,118 +1,143 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111f"><meta name="apple-mobile-web-app-capable" content="yes"><title>ATLAS Enterprise</title><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="stylesheet" href="styles.css?v=2.1.1"></head><body>
-<div id="offline" class="offline hidden">Offline — work is saved and will sync later</div>
-<section id="configScreen" class="screen center hidden"><div class="card auth"><img src="atlas-logo.jpg" class="logo"><h1>Connect Firebase</h1><p>Paste the Firebase configuration object from the Firebase console.</p><textarea id="config" rows="12" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea><button id="saveConfig" class="primary">Connect Atlas</button><p id="configError" class="error"></p></div></section>
-<section id="authScreen" class="screen center hidden"><div class="card auth"><img src="atlas-logo.jpg" class="logo"><h1>ATLAS Enterprise</h1><p>Construction Operations Platform</p><div class="tabs"><button id="signInTab" class="active">Sign In</button><button id="ownerTab">Owner Setup</button></div><form id="signIn"><label>Email<input id="email" type="email" required></label><label>Password<input id="password" type="password" required></label><button class="primary">Sign In</button></form><form id="ownerSetup" class="hidden"><label>Name<input id="ownerName" value="Kendall" required></label><label>Email<input id="ownerEmail" type="email" required></label><label>Password<input id="ownerPassword" type="password" minlength="8" required></label><button class="primary">Create First Owner</button></form><p id="authError" class="error"></p><button id="changeConfig" class="link">Change Firebase connection</button></div></section>
-<section id="app" class="hidden"><header><div class="brand"><img src="icon-192.png"><div><b>ATLAS</b><span>Enterprise</span></div></div><div><span id="sync" class="badge">Online</span><button id="logout">Log out</button></div></header><div class="shell"><aside><div class="profile"><b id="profileName"></b><span id="profileRole"></span></div><label>Workspace<select id="workspace"></select></label><nav><button data-view="dashboard" class="nav active">Dashboard</button><button data-view="estimate" class="nav">New Estimate</button><button data-view="estimates" class="nav">Estimates</button><button data-view="projects" class="nav">Projects</button><button data-view="customers" class="nav">Customers</button><button data-view="pricing" class="nav">Pricing</button><button data-view="companies" class="nav owner">Companies</button></nav></aside><main>
-<section id="dashboard" class="view"><div class="pagehead"><div><h2>Dashboard</h2><p id="welcome"></p></div><button class="primary newEstimate">+ New Estimate</button></div><div class="kpis"><div><span>Estimates</span><b id="estimateCount">0</b></div><div><span>Customers</span><b id="customerCount">0</b></div><div><span>Projects</span><b id="projectCount">0</b></div><div><span>Open Quotes</span><b id="openCount">0</b></div><div><span>Workspace</span><b id="companyName">—</b></div></div><div class="panel"><h3>Recent Estimates</h3><div id="recent"></div></div></section>
-<section id="estimate" class="view hidden">
-<div class="pagehead"><div><h2>Atlas Estimate Builder</h2><p>May-sheet workflow: base and adders first, profit last, final whole-dollar rate.</p></div><div class="quote-chip">Last Quote: <b id="lastQuoteNumber">—</b></div></div>
-<form id="estimateForm" class="panel grid">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1f33">
+  <title>Atlas Command Center</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="offlineBar" class="offline-bar hidden">Offline mode — changes are saved on this device.</div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="icon-192.png" alt=""><div><strong>ATLAS</strong><span>Command Center</span></div></div>
+    <nav id="nav">
+      <button class="nav active" data-view="dashboard">◫ <span>Dashboard</span></button>
+      <button class="nav" data-view="estimator">▤ <span>Estimator</span></button>
+      <button class="nav" data-view="projects">▣ <span>Projects</span></button>
+      <button class="nav" data-view="customers">♙ <span>Customers</span></button>
+      <button class="nav" data-view="documents">▱ <span>Documents</span></button>
+      <button class="nav" data-view="field">⌖ <span>Field</span></button>
+      <button class="nav" data-view="settings">⚙ <span>Settings</span></button>
+    </nav>
+    <div class="sidebar-foot"><span id="syncDot" class="dot"></span><span id="syncText">Local data ready</span></div>
+  </aside>
 
-<div class="customer-selector full">
-  <div class="customer-mode">
-    <label><input type="radio" name="customerMode" id="customerModeExisting" value="existing" checked> Existing Customer</label>
-    <label><input type="radio" name="customerMode" id="customerModeNew" value="new"> New Customer</label>
-    <input type="hidden" id="customerMode" value="existing">
-  </div>
+  <main>
+    <header class="topbar">
+      <div><h1 id="pageTitle">Executive Dashboard</h1><p id="companyLabel">Delamere Industries workspace</p></div>
+      <div class="top-actions">
+        <select id="companySelect"><option>Delamere Industries</option><option>HDAV</option><option>KGCW Holdings</option></select>
+        <button id="installBtn" class="ghost hidden">Install App</button>
+        <button id="athenaBtn" class="primary">Ask Athena</button>
+      </div>
+    </header>
 
-  <div id="existingCustomerBlock" class="customer-card">
-    <label>Existing Customer
-      <select id="estCustomer" required>
-        <option value="">Select customer</option>
-      </select>
-    </label>
-  </div>
+    <section id="dashboard" class="view active">
+      <div class="hero">
+        <div><span class="eyebrow">TODAY'S OPERATIONS</span><h2>Good morning, Kendall.</h2><p>One place for bids, active work, project risks, and field activity.</p></div>
+        <button class="primary" data-open-estimator>+ New Estimate</button>
+      </div>
+      <div class="metrics">
+        <article><span>Open Bid Pipeline</span><strong id="mPipeline">$0</strong><small id="mBidCount">0 estimates</small></article>
+        <article><span>Active Projects</span><strong id="mProjects">0</strong><small>company workspace</small></article>
+        <article><span>Pending Documents</span><strong id="mDocs">0</strong><small>RFIs, submittals, POs</small></article>
+        <article><span>Installed This Week</span><strong id="mInstalled">0 LF</strong><small>field progress</small></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><h3>Recent Estimates</h3><button class="link" data-open-estimator>Open estimator</button></div><div id="recentEstimates" class="empty">No estimates saved yet.</div></article>
+        <article class="panel"><div class="panel-head"><h3>Atlas Alerts</h3></div><div id="alerts"></div></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><h3>Active Projects</h3><button class="link" data-view-target="projects">View all</button></div><div id="dashboardProjects"></div></article>
+        <article class="panel"><div class="panel-head"><h3>Upcoming Milestones</h3></div><div id="milestones"></div></article>
+      </div>
+    </section>
 
-  <div id="newCustomerBlock" class="customer-card hidden">
-    <div class="grid">
-      <label>Company / Customer Name<input id="newCustomerName"></label>
-      <label>Contact Name<input id="newCustomerContact"></label>
-      <label>Email<input id="newCustomerEmail" type="email"></label>
-      <label>Phone<input id="newCustomerPhone" type="tel"></label>
-      <label>Billing Address<input id="newCustomerBilling"></label>
-      <label>Job Address<input id="newCustomerJob"></label>
-      <label class="check"><input id="newCustomerTaxExempt" type="checkbox"> Tax Exempt</label>
-      <label class="check"><input id="saveNewCustomer" type="checkbox" checked> Save customer to ATLAS</label>
-      <label class="full">Customer Notes<textarea id="newCustomerNotes" rows="2"></textarea></label>
-    </div>
-  </div>
-</div>
-<label>Project<select id="estProject" required><option value="">Select project</option></select></label>
-<label>Location<input id="estLocation"></label>
-<label>Quote Type<select id="quoteMode"><option value="install">Furnish & Install</option><option value="material">Materials Only</option></select></label>
-<label class="full">Rail / Fence Type<select id="estType"></select></label>
-<label>Quantity LF<input id="qty" type="number" value="1000" min="1"></label>
-<label>Base / LF<input id="base" type="number" step=".01"></label>
-<label>Production / Day<input id="production" type="number"></label>
-<label>Profit / LF<input id="profit" type="number" step=".01"></label>
-<label><input id="addGrab" type="checkbox"> Add Grab Rail</label>
-<label>Grab Rail / LF<input id="grabRate" type="number" step=".01"></label>
-<label><input id="addPowder" type="checkbox"> Add Powder Coat</label>
-<label>Powder Coat / LF<input id="powderRate" type="number" step=".01"></label>
-<label>Hoops / Ends<input id="hoops" type="number" value="2"></label>
-<label>Hoop Cost Each<input id="hoopRate" type="number" step=".01"></label>
-<label>Posts / Special Units<input id="posts" type="number" value="0"></label>
-<label>Post Cost Each<input id="postRate" type="number" step=".01"></label>
-<div id="installFields" class="full subgrid">
-<label>Labor / Crew Day<input id="laborDay" type="number" value="1500"></label>
-<label>Total Miles<input id="miles" type="number" value="0"></label>
-<label>Mileage Rate<input id="mileRate" type="number" step=".01" value="2.50"></label>
-<label>Hotel Nights<input id="nights" type="number" value="0"></label>
-<label>Hotel / Night<input id="hotel" type="number" value="1000"></label>
-<label>Travel Half-Days<input id="travelHalfDays" type="number" value="0"></label>
-</div>
-<label>Equipment Total<input id="equipment" type="number" value="0"></label><label class="check"><input id="equipmentContingency" type="checkbox"> Add 30% equipment contingency</label>
-<label>Field Verification<select id="fieldVerify"><option value="none">None</option><option value="local">Local — $350</option><option value="regional">Regional — $650</option><option value="long">Long Distance — $950</option><option value="custom">Custom</option></select></label>
-<label>Custom Field Fee<input id="fieldCustom" type="number" value="0"></label>
-<label><input id="shopDrawings" type="checkbox"> Add Shop Drawings — $300</label><label>Material Sales Tax %<input id="salesTaxRate" type="number" step="0.001" value="7.0"></label>
-<label class="full">Estimate Notes<textarea id="estimateNotes" rows="3"></textarea></label>
-<div class="full info-strip"><span>Lead Time: <b id="leadTime"></b></span><span id="pricingNote"></span></div>
-<div class="summary full">
-<div><span>Material Base</span><b id="sBase"></b></div>
-<div><span>Labor</span><b id="sLabor"></b></div>
-<div><span>Travel / Hotel</span><b id="sTravel"></b></div>
-<div><span>Other Adders</span><b id="sOther"></b></div>
-<div><span>Profit</span><b id="sProfit"></b></div>
-<div id="taxLine"><span>Tax / Fee</span><b id="sTax"></b></div>
-<div><span>Exact / LF</span><b id="sExactLF"></b></div>
-<div><span>Rounded / LF</span><b id="sLF"></b></div>
-<div><span>Crew Days</span><b id="sDays"></b></div>
-<div class="total"><span>Recommended Quote</span><b id="sTotal"></b></div>
-</div>
-<div class="full actions"><button class="primary">Save Estimate</button><button type="button" id="print">Print / PDF</button></div>
-</form></section>
-<section id="estimates" class="view hidden"><div class="pagehead"><h2>Estimates</h2><button class="primary newEstimate">+ New Estimate</button></div><div id="estimateList" class="panel"></div></section>
+    <section id="estimator" class="view">
+      <div class="section-actions"><div><h2>Atlas Estimator</h2><p>May Sheet sequence: base and adders first, profit last, final rate rounded.</p></div><div><button id="saveEstimate" class="primary">Save Estimate</button><button id="printEstimate" class="ghost">Print / PDF</button></div></div>
+      <div class="est-grid">
+        <article class="panel">
+          <h3>Project & Scope</h3>
+          <div class="form-grid">
+            <label>Project Name<input id="projectName" placeholder="Project name"></label>
+            <label>Customer<input id="customer" placeholder="Customer"></label>
+            <label>Location<input id="location" placeholder="City / County"></label>
+            <label>Estimate Type<select id="quoteType"><option>Full Install</option><option>Material Only</option></select></label>
+            <label class="wide">Rail / Fence Type<select id="rail"></select></label>
+            <label>Linear Feet<input id="lf" type="number" value="100" min="0"></label>
+            <label>Hoop Ends<input id="hoops" type="number" value="2" min="0"></label>
+            <label>Finish<select id="finish"><option>Mill / Galvanized</option><option>Powder Coat</option></select></label>
+            <label>Grab Rail<select id="grab"><option>No</option><option>Yes</option></select></label>
+          </div>
+        </article>
+        <article class="panel">
+          <h3>Installation & Travel</h3>
+          <div class="form-grid">
+            <label>Labor Mode<select id="laborMode"><option>Auto</option><option>Manual</option></select></label>
+            <label>Manual Crew Days<input id="manualDays" type="number" value="1" min="0" step=".5"></label>
+            <label>Total Miles<input id="miles" type="number" value="0" min="0"></label>
+            <label>Mileage Rate<input id="mileageRate" type="number" value="2.5" step=".01"></label>
+            <label>Hotel Nights<input id="hotelNights" type="number" value="0" min="0"></label>
+            <label>Hotel / Night<input id="hotelRate" type="number" value="1000" min="0"></label>
+            <label>Field Verification<select id="fieldTier"><option value="0">None</option><option value="350">Local — $350</option><option value="650">Regional — $650</option><option value="950">Long Distance — $950+</option></select></label>
+            <label>Equipment / Misc.<input id="equipment" type="number" value="0" min="0"></label>
+          </div>
+        </article>
+      </div>
+      <article class="panel">
+        <div class="rail-summary" id="railSummary"></div>
+        <div class="table-wrap"><table><thead><tr><th>Cost Item</th><th>Qty</th><th>Rate</th><th>Amount</th><th>$/LF</th></tr></thead><tbody id="breakdown"></tbody></table></div>
+      </article>
+      <div class="quote-summary">
+        <article><span>Subtotal Before Profit</span><strong id="subtotal">$0</strong></article>
+        <article><span>Profit</span><strong id="profit">$0</strong></article>
+        <article><span>True Calculated $/LF</span><strong id="truePerLf">$0</strong></article>
+        <article class="featured"><span>Rounded Sell $/LF</span><strong id="roundedPerLf">$0</strong></article>
+        <article class="featured"><span>Final Quote Total</span><strong id="finalTotal">$0</strong></article>
+      </div>
+    </section>
 
-<section id="projects" class="view hidden">
-<div class="pagehead"><div><h2>Projects</h2><p>Company-scoped project records and estimating history.</p></div><button class="primary newProject">+ New Project</button></div>
-<form id="projectForm" class="panel grid">
-<label>Project Name<input id="projectName" required></label>
-<label>Customer<input id="projectCustomer" required></label>
-<label>Project Number<input id="projectNumber"></label>
-<label>Location<input id="projectLocation"></label>
-<label>Status<select id="projectStatus"><option>Active</option><option>Bidding</option><option>Awarded</option><option>On Hold</option><option>Complete</option></select></label>
-<label class="full">Notes<textarea id="projectNotes" rows="3"></textarea></label>
-<div class="full"><button class="primary">Save Project</button></div>
-</form>
-<div id="projectList" class="panel"></div>
-</section>
-<section id="customers" class="view hidden"><h2>Customers</h2><form id="customerForm" class="panel inline"><input id="custName" placeholder="Customer/company" required><input id="custContact" placeholder="Contact"><input id="custEmail" type="email" placeholder="Email"><button class="primary">Add Customer</button></form><div id="customerList" class="panel"></div></section>
-<section id="pricing" class="view hidden"><h2>Pricing Database</h2><div class="panel table"><table><thead><tr><th>Code</th><th>Description</th><th>Material</th><th>Base/LF</th><th>Production</th><th>Hoop</th><th>Pricing Note</th></tr></thead><tbody id="pricingRows"></tbody></table></div></section>
-<section id="companies" class="view hidden"><h2>Companies</h2><form id="companyForm" class="panel inline"><input id="newCompany" placeholder="Company name" required><button class="primary">Add Company</button></form><div id="companyList" class="panel"></div></section>
-</main></div></section>
-<section id="printProposal" class="print-only">
-<div class="proposal-head"><img src="atlas-logo.jpg"><div><h1>ATLAS Enterprise</h1><p>Construction Operations Proposal</p></div></div>
-<div class="proposal-meta">
-<div><span>Company</span><b id="printCompany"></b></div><div><span>Quote</span><b id="printQuoteNumber"></b></div>
-<div><span>Customer</span><b id="printCustomer"></b></div>
-<div><span>Project</span><b id="printProject"></b></div>
-<div><span>Location</span><b id="printLocation"></b></div>
+    <section id="projects" class="view">
+      <div class="section-actions"><div><h2>Projects</h2><p>Company-scoped project workspaces.</p></div><button id="addProject" class="primary">+ Add Project</button></div>
+      <div id="projectList" class="cards-grid"></div>
+    </section>
+
+    <section id="customers" class="view">
+      <div class="section-actions"><div><h2>Customers</h2><p>Local CRM foundation.</p></div><button id="addCustomer" class="primary">+ Add Customer</button></div>
+      <div id="customerList" class="cards-grid"></div>
+    </section>
+
+    <section id="documents" class="view">
+      <div class="section-actions"><div><h2>Documents</h2><p>RFIs, submittals, purchase orders, change orders, and closeout.</p></div><button id="addDocument" class="primary">+ Add Document</button></div>
+      <div id="documentList" class="panel"></div>
+    </section>
+
+    <section id="field" class="view">
+      <div class="section-actions"><div><h2>Field Operations</h2><p>Offline daily reports and installed quantities.</p></div><button id="addFieldReport" class="primary">+ Daily Report</button></div>
+      <div id="fieldList" class="cards-grid"></div>
+    </section>
+
+    <section id="settings" class="view">
+      <article class="panel"><h2>Workspace Settings</h2><div class="form-grid">
+        <label>Owner / Super Admin<input value="Kendall" disabled></label>
+        <label>Default Origin<input value="Brooksville, FL" disabled></label>
+        <label>Labor / Crew Day<input value="$1,500" disabled></label>
+        <label>Default Mileage Rate<input value="$2.50 / mile" disabled></label>
+      </div><p class="muted">This build stores all information locally. Firebase authentication and cloud synchronization hooks are reserved for the next connected deployment.</p></article>
+    </section>
+  </main>
 </div>
-<div class="proposal-scope"><h2>Scope</h2><p id="printScope"></p></div>
-<table class="proposal-breakdown"><thead><tr><th>Estimate Breakdown</th><th>Amount</th></tr></thead><tbody id="printBreakdown"></tbody></table><div class="proposal-total"><div><span>Recommended Rate</span><b id="printRate"></b></div><div><span>Total Proposal</span><b id="printTotal"></b></div></div>
-<div><h3>Notes</h3><p id="printNotes"></p></div>
-<footer>ATLAS Enterprise Solutions</footer>
-</section>
-<div id="toast" class="toast hidden"></div>
-<script>localStorage.setItem("atlas_app_version","2.1.1");</script>
-<script type="module" src="atlas-v2-1-1.js?v=2.1.1"></script></body></html>
+
+<div id="athenaPanel" class="athena">
+  <div class="athena-head"><div><strong>Athena</strong><span>Atlas Assistant</span></div><button id="closeAthena">×</button></div>
+  <div id="athenaMessages" class="athena-messages"><div class="bot">I can summarize the workspace, open the estimator, and flag missing pricing or project information.</div></div>
+  <form id="athenaForm"><input id="athenaInput" placeholder="Ask about estimates, projects, or alerts"><button>Send</button></form>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
