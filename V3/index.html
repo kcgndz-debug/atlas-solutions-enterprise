@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Atlas Enterprise V3 Full Preview</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="offlineBar" class="offline-bar hidden">Offline — changes are being saved locally.</div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">A</div><div><strong>Atlas Enterprise</strong><small>V3 Full Preview</small></div></div>
+    <nav>
+      <button class="nav active" data-view="dashboard">Dashboard</button>
+      <button class="nav" data-view="estimator">Estimator</button>
+      <button class="nav" data-view="projects">Projects</button>
+      <button class="nav" data-view="customers">Customers</button>
+      <button class="nav" data-view="materials">Material Requests</button>
+      <button class="nav" data-view="documents">Documents</button>
+      <button class="nav" data-view="field">Field Operations</button>
+      <button class="nav" data-view="settings">Settings</button>
+    </nav>
+    <div class="sidebar-footer">
+      <label>Company
+        <select id="companySelect"><option>Delamere Industries</option><option>HDAV</option></select>
+      </label>
+      <div class="sync"><span id="syncDot"></span><span id="syncText">Saved locally</span></div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div><h1 id="pageTitle">Executive Dashboard</h1><p id="companyLabel">Delamere Industries workspace</p></div>
+      <div class="top-actions"><button id="installBtn" class="secondary hidden">Install App</button><button id="athenaBtn">Athena</button></div>
+    </header>
+
+    <section id="dashboard" class="view active">
+      <div class="metric-grid">
+        <article class="metric"><span>Pipeline</span><strong id="mPipeline">$0.00</strong><small id="mBidCount">0 estimates</small></article>
+        <article class="metric"><span>Projects</span><strong id="mProjects">0</strong><small>Active records</small></article>
+        <article class="metric"><span>Material Requests</span><strong id="mMaterials">0</strong><small>Open requests</small></article>
+        <article class="metric"><span>Installed</span><strong id="mInstalled">0 LF</strong><small>Field reported</small></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><h2>Recent Estimates</h2><button class="link" data-open-estimator>New Estimate</button></div><div id="recentEstimates"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Atlas Alerts</h2></div><div id="alerts"></div></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><h2>Active Projects</h2><button class="link" data-view-target="projects">View All</button></div><div id="dashboardProjects"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Open Material Requests</h2><button class="link" data-view-target="materials">View All</button></div><div id="dashboardMaterials"></div></article>
+      </div>
+    </section>
+
+    <section id="estimator" class="view">
+      <div class="section-actions">
+        <div><h2>Atlas Estimator</h2><p>Base and adders first, profit last, final customer pricing after rounding.</p></div>
+        <div class="button-row"><button id="saveEstimate">Save Estimate</button><button id="printEstimate" class="secondary">Print / PDF</button></div>
+      </div>
+      <article class="panel">
+        <h3>Project & Scope</h3>
+        <div class="form-grid">
+          <label>Project Name<input id="projectName" placeholder="Project name"></label>
+          <label>Customer<input id="customer" placeholder="Customer"></label>
+          <label>Location<input id="location" placeholder="City / County"></label>
+          <label>Estimate Type<select id="quoteType"><option>Full Install</option><option>Material Only</option></select></label>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="panel-head"><div><h3>Estimate Items</h3><p>Add rail, fence, gate, labor, material, or custom items.</p></div><button id="addItem">+ Add Item</button></div>
+        <div id="estimateItems" class="item-list"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-head"><div><h3>Travel & Mobilization</h3><p>Applied once per estimate.</p></div><button id="openMaps" class="secondary">Open Google Maps</button></div>
+        <div class="form-grid">
+          <label class="wide">Project Address<input id="travelAddress" placeholder="Full project address"></label>
+          <label>One-Way Miles<input id="oneWayMiles" type="number" min="0" step="0.1" value="0"></label>
+          <label class="check"><input id="roundTrip" type="checkbox" checked> Round Trip</label>
+          <label>Mileage Rate<input id="mileageRate" type="number" min="0" step="0.01" value="2.50"></label>
+          <label class="check"><input id="fieldVerificationEnabled" type="checkbox"> Field Verification</label>
+          <label>Field Charge<input id="fieldVerificationCharge" type="number" min="0" value="350"></label>
+          <label>Travel Labor<select id="travelLaborType"><option value="none">None</option><option value="half-day">Half Day</option><option value="full-day">Full Day</option><option value="custom">Custom</option></select></label>
+          <label>Custom Travel Labor<input id="customTravelLabor" type="number" min="0" value="0"></label>
+          <label class="check"><input id="overnightStay" type="checkbox"> Overnight Stay</label>
+          <label>Hotel Nights<input id="hotelNights" type="number" min="0" value="0"></label>
+          <label>Hotel Rate<input id="hotelRate" type="number" min="0" value="1000"></label>
+          <label>Per Diem Days<input id="perDiemDays" type="number" min="0" value="0"></label>
+          <label>Per Diem Rate<input id="perDiemRate" type="number" min="0" value="0"></label>
+          <label>Tolls<input id="tolls" type="number" min="0" step="0.01" value="0"></label>
+          <label>Parking<input id="parking" type="number" min="0" step="0.01" value="0"></label>
+          <label>Miscellaneous<input id="miscellaneous" type="number" min="0" step="0.01" value="0"></label>
+          <label class="check"><input id="manualOverrideEnabled" type="checkbox"> Manual Travel Override</label>
+          <label>Override Total<input id="manualOverrideTotal" type="number" min="0" step="0.01" value="0"></label>
+        </div>
+        <div id="travelSummary" class="summary-grid"></div>
+      </article>
+      <article class="panel">
+        <h3>Estimate Summary</h3>
+        <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead><tbody id="breakdown"></tbody></table></div>
+        <div class="totals">
+          <div><span>Item Subtotal</span><strong id="itemSubtotal">$0.00</strong></div>
+          <div><span>Travel & Mobilization</span><strong id="travelTotal">$0.00</strong></div>
+          <div><span>Sales Tax / Fee</span><strong id="taxTotal">$0.00</strong></div>
+          <div><span>Profit</span><strong id="profitTotal">$0.00</strong></div>
+          <div class="grand"><span>Grand Total</span><strong id="finalTotal">$0.00</strong></div>
+        </div>
+      </article>
+    </section>
+
+    <section id="projects" class="view">
+      <div class="section-actions"><div><h2>Projects</h2><p>Company-scoped project records.</p></div><button id="addProject">Add Project</button></div>
+      <div id="projectList" class="card-grid"></div>
+    </section>
+
+    <section id="customers" class="view">
+      <div class="section-actions"><div><h2>Customers</h2><p>Customer and contact records.</p></div><button id="addCustomer">Add Customer</button></div>
+      <div id="customerList" class="card-grid"></div>
+    </section>
+
+    <section id="materials" class="view">
+      <div class="section-actions"><div><h2>Material Requests</h2><p>Field-to-purchasing requests with status tracking.</p></div><button id="addMaterialRequest">New Request</button></div>
+      <div id="materialList" class="card-grid"></div>
+    </section>
+
+    <section id="documents" class="view">
+      <div class="section-actions"><div><h2>Documents</h2><p>RFIs, submittals, POs, and change orders.</p></div><button id="addDocument">Add Document</button></div>
+      <div id="documentList"></div>
+    </section>
+
+    <section id="field" class="view">
+      <div class="section-actions"><div><h2>Field Operations</h2><p>Daily updates and installed quantities.</p></div><button id="addFieldReport">Add Field Report</button></div>
+      <div id="fieldList" class="card-grid"></div>
+    </section>
+
+    <section id="settings" class="view">
+      <article class="panel"><h2>Settings</h2><p>This full preview saves locally and works offline. Firebase synchronization and role-based permissions can be connected after this workflow is approved.</p></article>
+    </section>
+  </main>
+</div>
+
+<div id="athenaPanel" class="athena">
+  <div class="athena-head"><div><strong>Athena</strong><span>Atlas Assistant</span></div><button id="closeAthena">×</button></div>
+  <div id="athenaMessages" class="athena-messages"><div class="bot">I can summarize estimates, projects, material requests, and alerts.</div></div>
+  <form id="athenaForm"><input id="athenaInput" placeholder="Ask about estimates, projects, or requests"><button>Send</button></form>
+</div>
+
+<script src="js/modules/travels.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "Atlas Enterprise V3 Full Preview",
+  "short_name": "Atlas V3",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#0f172a"
+}
