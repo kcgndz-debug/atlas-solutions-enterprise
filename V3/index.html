@@ -60,6 +60,10 @@
         <div class="button-row"><button id="saveEstimate">Save Estimate</button><button id="printEstimate" class="secondary">Print / PDF</button></div>
       </div>
       <article class="panel">
+        <div class="panel-head"><div><h3>Saved Estimates</h3><p>Click to reopen, duplicate, or delete a saved quote.</p></div><input id="searchEstimates" class="search" placeholder="Search estimates"></div>
+        <div id="estimateList" class="entity-list"></div>
+      </article>
+      <article class="panel">
         <h3>Project & Scope</h3>
         <div class="form-grid">
           <label>Project Name<input id="projectName" placeholder="Project name"></label>
@@ -80,6 +84,7 @@
           <label class="check"><input id="roundTrip" type="checkbox" checked> Round Trip</label>
           <label>Mileage Rate<input id="mileageRate" type="number" min="0" step="0.01" value="2.50"></label>
           <label class="check"><input id="fieldVerificationEnabled" type="checkbox"> Field Verification</label>
+          <label>Verification Type<select id="fieldVerificationOption"><option value="350">Local under 1 hour each way ($350)</option><option value="650">Regional 1–3 hours each way ($650)</option><option value="950">Long distance over 3 hours each way ($950)</option><option value="custom">Custom charge</option></select></label>
           <label>Field Charge<input id="fieldVerificationCharge" type="number" min="0" value="350"></label>
           <label>Travel Labor<select id="travelLaborType"><option value="none">None</option><option value="half-day">Half Day</option><option value="full-day">Full Day</option><option value="custom">Custom</option></select></label>
           <label>Custom Travel Labor<input id="customTravelLabor" type="number" min="0" value="0"></label>
@@ -110,27 +115,27 @@
     </section>
 
     <section id="projects" class="view">
-      <div class="section-actions"><div><h2>Projects</h2><p>Company-scoped project records.</p></div><button id="addProject">Add Project</button></div>
+      <div class="section-actions"><div><h2>Projects</h2><p>Company-scoped project records.</p></div><div class="search-row"><button id="addProject">Add Project</button><input id="searchProjects" class="search" placeholder="Search projects"></div></div>
       <div id="projectList" class="card-grid"></div>
     </section>
 
     <section id="customers" class="view">
-      <div class="section-actions"><div><h2>Customers</h2><p>Customer and contact records.</p></div><button id="addCustomer">Add Customer</button></div>
+      <div class="section-actions"><div><h2>Customers</h2><p>Customer and contact records.</p></div><div class="search-row"><button id="addCustomer">Add Customer</button><input id="searchCustomers" class="search" placeholder="Search customers"></div></div>
       <div id="customerList" class="card-grid"></div>
     </section>
 
     <section id="materials" class="view">
-      <div class="section-actions"><div><h2>Material Requests</h2><p>Field-to-purchasing requests with status tracking.</p></div><button id="addMaterialRequest">New Request</button></div>
+      <div class="section-actions"><div><h2>Material Requests</h2><p>Field-to-purchasing requests with status tracking.</p></div><div class="search-row"><button id="addMaterialRequest">New Request</button><input id="searchMaterials" class="search" placeholder="Search requests"></div></div>
       <div id="materialList" class="card-grid"></div>
     </section>
 
     <section id="documents" class="view">
-      <div class="section-actions"><div><h2>Documents</h2><p>RFIs, submittals, POs, and change orders.</p></div><button id="addDocument">Add Document</button></div>
+      <div class="section-actions"><div><h2>Documents</h2><p>RFIs, submittals, POs, and change orders.</p></div><div class="search-row"><button id="addDocument">Add Document</button><input id="searchDocuments" class="search" placeholder="Search documents"></div></div>
       <div id="documentList"></div>
     </section>
 
     <section id="field" class="view">
-      <div class="section-actions"><div><h2>Field Operations</h2><p>Daily updates and installed quantities.</p></div><button id="addFieldReport">Add Field Report</button></div>
+      <div class="section-actions"><div><h2>Field Operations</h2><p>Daily updates and installed quantities.</p></div><div class="search-row"><button id="addFieldReport">Add Field Report</button><input id="searchFieldReports" class="search" placeholder="Search reports"></div></div>
       <div id="fieldList" class="card-grid"></div>
     </section>
 
@@ -145,6 +150,8 @@
   <div id="athenaMessages" class="athena-messages"><div class="bot">I can summarize estimates, projects, material requests, and alerts.</div></div>
   <form id="athenaForm"><input id="athenaInput" placeholder="Ask about estimates, projects, or requests"><button>Send</button></form>
 </div>
+
+<div id="printQuote" class="print-quote hidden"></div>
 
 <script src="js/modules/travels.js"></script>
 <script src="app.js"></script>
