@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../../Desktop/Atlas/Atlas_Foundation_Package/supabase"
+		},
+		{
+			"path": "../../.git"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "atlas-solutions-enterprise"
+	}
+}
