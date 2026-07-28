@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="icon-192.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0f172a">
@@ -9,12 +10,87 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Atlas Login Screen -->
+<section id="atlasLoginScreen" class="atlas-login-screen">
+  <div class="atlas-login-card">
+    <img
+      src="assets/atlas-logo.jpg"
+      alt="Atlas Solutions"
+      class="atlas-login-logo"
+    >
+
+    <div class="atlas-login-heading">
+      <h1>Atlas Enterprise</h1>
+      <p>Secure operations and estimating platform</p>
+    </div>
+
+    <form id="atlasLoginForm" class="atlas-login-form">
+      <label for="atlasLoginEmail">Email address</label>
+      <input
+        id="atlasLoginEmail"
+        name="email"
+        type="email"
+        autocomplete="email"
+        placeholder="name@company.com"
+        required
+      >
+
+      <label for="atlasLoginPassword">Password</label>
+
+      <div class="atlas-password-field">
+        <input
+          id="atlasLoginPassword"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          required
+        >
+
+        <button
+          id="atlasTogglePassword"
+          class="atlas-password-toggle"
+          type="button"
+          aria-label="Show password"
+        >
+          Show
+        </button>
+      </div>
+
+      <div id="atlasLoginMessage" class="atlas-login-message" role="alert"></div>
+
+      <button id="atlasLoginButton" class="atlas-login-button" type="submit">
+        Sign in
+      </button>
+    </form>
+
+    <p class="atlas-login-footer">
+      Authorized Atlas users only
+    </p>
+  </div>
+</section>
 <div id="offlineBar" class="offline-bar hidden">Offline — changes are being saved locally.</div>
-<div class="app-shell">
+<div id="atlasAppShell" class="app-shell atlas-auth-hidden">
   <aside class="sidebar">
-    <div class="brand"><div class="brand-mark">A</div><div><strong>Atlas Enterprise</strong><small>V3 Full Preview</small></div></div>
+    <div class="brand atlas-sidebar-brand">
+
+    <img
+        src="assets/atlas-logo.jpg"
+        class="atlas-sidebar-logo"
+        alt="Atlas Solutions">
+
+    <div class="atlas-sidebar-brand-text">
+        <strong>Atlas Enterprise</strong>
+        <small id="atlasCurrentWorkspace">
+            Platform Owner
+        </small>
+    </div>
+
+</div>
     <nav>
       <button class="nav active" data-view="dashboard">Dashboard</button>
+      <button class="nav" data-view="mission">Mission Control</button>
+      <button class="nav" data-view="crew">Crew Operations</button>
       <button class="nav" data-view="estimator">Estimator</button>
       <button class="nav" data-view="projects">Projects</button>
       <button class="nav" data-view="customers">Customers</button>
@@ -22,12 +98,14 @@
       <button class="nav" data-view="documents">Documents</button>
       <button class="nav" data-view="field">Field Operations</button>
       <button class="nav" data-view="settings">Settings</button>
+      <button class="nav" data-view="users">User Management</button>
     </nav>
     <div class="sidebar-footer">
       <label>Company
         <select id="companySelect"><option>Delamere Industries</option><option>HDAV</option></select>
       </label>
       <div class="sync"><span id="syncDot"></span><span id="syncText">Saved locally</span></div>
+      <button id="atlasSignOutButton" class="secondary atlas-signout-button" type="button">Sign Out</button>
     </div>
   </aside>
 
@@ -51,6 +129,61 @@
       <div class="two-col">
         <article class="panel"><div class="panel-head"><h2>Active Projects</h2><button class="link" data-view-target="projects">View All</button></div><div id="dashboardProjects"></div></article>
         <article class="panel"><div class="panel-head"><h2>Open Material Requests</h2><button class="link" data-view-target="materials">View All</button></div><div id="dashboardMaterials"></div></article>
+      </div>
+    </section>
+
+
+    <section id="mission" class="view">
+      <div class="section-actions">
+        <div><h2>Mission Control</h2><p>Live company operations, project health, workload, and field activity.</p></div>
+        <div class="button-row"><button id="addMissionActivity">Log Activity</button><button id="refreshMission" class="secondary">Refresh</button></div>
+      </div>
+      <div class="metric-grid mission-metrics">
+        <article class="metric"><span>Contract Backlog</span><strong id="mcBacklog">$0.00</strong><small>Open project value</small></article>
+        <article class="metric"><span>Healthy Projects</span><strong id="mcHealthy">0</strong><small>Operating normally</small></article>
+        <article class="metric"><span>Projects at Risk</span><strong id="mcAtRisk">0</strong><small>Need management attention</small></article>
+        <article class="metric"><span>Crews Reporting</span><strong id="mcCrews">0</strong><small>Field reports today</small></article>
+      </div>
+      <div class="two-col mission-layout">
+        <article class="panel">
+          <div class="panel-head"><div><h3>Project Health</h3><p>Calculated from workflow, materials, reports, and next actions.</p></div></div>
+          <div id="missionProjectHealth" class="mission-project-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Live Activity</h3><p>Newest operational updates first.</p></div></div>
+          <div id="missionActivity" class="mission-activity"></div>
+        </article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><h3>PM Workload</h3><p>Active assignments and value by project manager.</p></div></div><div id="missionWorkload"></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Action Queue</h3><p>Items that should be handled next.</p></div></div><div id="missionActions"></div></article>
+      </div>
+    </section>
+
+
+    <section id="crew" class="view">
+      <div class="section-actions">
+        <div><h2>Crew Operations</h2><p>Field assignments, time, daily production, safety, photos, materials, and equipment.</p></div>
+        <div class="button-row"><button id="openCrewReport">Daily Report</button><button id="openCrewPhoto" class="secondary">Add Photo</button><button id="openCrewMaterial" class="secondary">Material Request</button></div>
+      </div>
+      <div class="metric-grid">
+        <article class="metric"><span>Active Jobs</span><strong id="crewMetricJobs">0</strong><small>Available to field crews</small></article>
+        <article class="metric"><span>Installed Today</span><strong id="crewMetricInstalled">0 LF</strong><small>Daily report production</small></article>
+        <article class="metric"><span>Photos Today</span><strong id="crewMetricPhotos">0</strong><small>Progress and issue records</small></article>
+        <article class="metric"><span>Open Requests</span><strong id="crewMetricRequests">0</strong><small>Materials awaiting action</small></article>
+      </div>
+      <article class="panel crew-clock-panel">
+        <div class="panel-head"><div><h3>Field Clock</h3><p>Clock the active crew into a project and record field hours.</p></div><div id="crewClockStatus" class="crew-clock-status"></div></div>
+        <div class="crew-clock-controls"><label>Project<select id="crewClockProject" data-crew-project-select></select></label><button id="crewClockButton" type="button">Clock In</button></div>
+      </article>
+      <article class="panel"><div class="panel-head"><div><h3>Today's Jobs</h3><p>Open field assignments and one-touch crew actions.</p></div><button id="openCrewSafety" class="secondary">Safety Checklist</button></div><div id="crewAssignments" class="crew-job-grid"></div></article>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><h3>Recent Daily Reports</h3><p>Production, crew hours, delays, and notes.</p></div></div><div id="crewRecentReports"></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Safety Status</h3><p>Today's completed field safety checks.</p></div></div><div id="crewSafetyStatus"></div></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><h3>Photo Timeline</h3><p>Progress, issue, safety, and completion photos.</p></div></div><div id="crewPhotoTimeline" class="crew-photo-grid"></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Equipment</h3><p>Field checkout, assignment, and return status.</p></div><button id="openCrewEquipment" class="secondary">Check Out Equipment</button></div><div id="crewEquipmentList"></div></article>
       </div>
     </section>
 
@@ -139,6 +272,13 @@
       <div id="fieldList" class="card-grid"></div>
     </section>
 
+
+    <section id="users" class="view">
+      <div class="page-head"><div><p class="eyebrow">Administration</p><h1>User Management</h1><p>Assign company roles and project access. Production user creation and password resets are performed through Supabase.</p></div><button id="addDemoUser" data-permission="users.manage">Add Demo User</button></div>
+      <div class="permission-summary" id="permissionSummary"></div>
+      <div class="panel"><div class="panel-head"><h2>Role Access Matrix</h2></div><div class="table-wrap"><table class="access-table"><thead><tr><th>Role</th><th>Primary Workspace</th><th>Project Scope</th><th>Administration</th></tr></thead><tbody id="roleMatrixBody"></tbody></table></div></div>
+      <div class="panel"><div class="panel-head"><h2>Workspace Users</h2><span class="muted">Local demonstration records</span></div><div id="atlasUserList"></div></div>
+    </section>
     <section id="settings" class="view">
       <article class="panel"><h2>Settings</h2><p>This full preview saves locally and works offline. Firebase synchronization and role-based permissions can be connected after this workflow is approved.</p></article>
     </section>
@@ -153,7 +293,100 @@
 
 <div id="printQuote" class="print-quote hidden"></div>
 
+<dialog id="missionActivityDialog" class="atlas-dialog">
+  <form id="missionActivityForm" method="dialog">
+    <div class="dialog-head"><div><h3>Log Operational Activity</h3><p>Add a company-wide update to Mission Control.</p></div><button type="button" class="dialog-close" data-close-mission-dialog>×</button></div>
+    <div class="dialog-body form-grid">
+      <label>Activity Type<select id="missionActivityType"><option>Project Update</option><option>Crew Update</option><option>Material Update</option><option>Finance Update</option><option>Safety Update</option></select></label>
+      <label>Project<select id="missionActivityProject"></select></label>
+      <label class="wide">Update<textarea id="missionActivityMessage" rows="4" placeholder="What changed?" required></textarea></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close-mission-dialog>Cancel</button><button type="submit">Save Activity</button></div>
+  </form>
+</dialog>
+
+
+<dialog id="crewReportDialog" class="atlas-dialog">
+  <form id="crewReportForm">
+    <div class="dialog-head"><div><h3>Submit Daily Report</h3><p>Record today's crew production and field conditions.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
+    <div class="dialog-grid">
+      <label>Project<select id="crewReportProject" data-crew-project-select required></select></label>
+      <label>Crew Lead<input id="crewReportLead" placeholder="Crew lead"></label>
+      <label>Crew Count<input id="crewReportCount" type="number" min="1" value="3" required></label>
+      <label>Total Crew Hours<input id="crewReportHours" type="number" min="0" step="0.25" value="8" required></label>
+      <label>Installed LF<input id="crewReportInstalled" type="number" min="0" step="1" value="0"></label>
+      <label>Materials Used<input id="crewReportMaterials" placeholder="Posts, rail, concrete..."></label>
+      <label>Equipment Used<input id="crewReportEquipment" placeholder="Truck, auger, lift..."></label>
+      <label>Delays / Downtime<input id="crewReportDelays" placeholder="Weather, inspection, material..."></label>
+      <label class="wide">Progress Notes<textarea id="crewReportNotes" rows="4" placeholder="Work completed, issues, and next steps"></textarea></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Submit Report</button></div>
+  </form>
+</dialog>
+
+<dialog id="crewPhotoDialog" class="atlas-dialog">
+  <form id="crewPhotoForm">
+    <div class="dialog-head"><div><h3>Add Project Photo</h3><p>Photos remain available offline in this demo build.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
+    <div class="dialog-grid">
+      <label>Project<select id="crewPhotoProject" data-crew-project-select required></select></label>
+      <label>Category<select id="crewPhotoCategory"><option>Progress</option><option>Issue</option><option>Safety</option><option>Completion</option><option>Delivery</option></select></label>
+      <label class="wide">Photo<input id="crewPhotoFile" type="file" accept="image/*" capture="environment" required></label>
+      <label class="wide">Caption<textarea id="crewPhotoCaption" rows="3" placeholder="Describe what the photo shows"></textarea></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Save Photo</button></div>
+  </form>
+</dialog>
+
+<dialog id="crewMaterialDialog" class="atlas-dialog">
+  <form id="crewMaterialForm">
+    <div class="dialog-head"><div><h3>Send Material Request</h3><p>Route field needs into the existing purchasing queue.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
+    <div class="dialog-grid">
+      <label>Project<select id="crewMaterialProject" data-crew-project-select required></select></label>
+      <label>Urgency<select id="crewMaterialUrgency"><option>Normal</option><option>Urgent</option></select></label>
+      <label class="wide">Materials and Quantities<textarea id="crewMaterialItems" rows="4" required placeholder="Example: 12 posts, 24 bags concrete, 150 LF rail"></textarea></label>
+      <label class="wide">Notes<textarea id="crewMaterialNotes" rows="3" placeholder="Needed date, delivery location, substitutions..."></textarea></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Submit Request</button></div>
+  </form>
+</dialog>
+
+<dialog id="crewSafetyDialog" class="atlas-dialog">
+  <form id="crewSafetyForm">
+    <div class="dialog-head"><div><h3>Daily Safety Checklist</h3><p>Complete before field work begins.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
+    <div class="dialog-grid">
+      <label>Project<select id="crewSafetyProject" data-crew-project-select required></select></label>
+      <label class="check"><input id="crewSafetyPPE" type="checkbox"> Required PPE confirmed</label>
+      <label class="check"><input id="crewSafetyBriefing" type="checkbox"> Crew briefing completed</label>
+      <label class="check"><input id="crewSafetyArea" type="checkbox"> Work area inspected</label>
+      <label class="check"><input id="crewSafetyTools" type="checkbox"> Tools and equipment inspected</label>
+      <label class="check"><input id="crewSafetyIncident" type="checkbox"> Issue or incident requires review</label>
+      <label class="wide">Notes<textarea id="crewSafetyNotes" rows="3" placeholder="Hazards, corrective actions, or observations"></textarea></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Submit Checklist</button></div>
+  </form>
+</dialog>
+
+<dialog id="crewEquipmentDialog" class="atlas-dialog">
+  <form id="crewEquipmentForm">
+    <div class="dialog-head"><div><h3>Check Out Equipment</h3><p>Assign equipment to a project and crew member.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
+    <div class="dialog-grid">
+      <label>Project<select id="crewEquipmentProject" data-crew-project-select required></select></label>
+      <label>Equipment<input id="crewEquipmentName" required placeholder="Truck, trailer, auger, lift..."></label>
+      <label>Assigned To<input id="crewEquipmentAssignedTo" placeholder="Crew lead or member"></label>
+      <label>Condition<select id="crewEquipmentCondition"><option>Good</option><option>Needs Attention</option><option>Damaged</option></select></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Check Out</button></div>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/modules/supabase-client.js"></script>
+<script src="js/modules/permissions.js"></script>
+<script src="js/modules/auth.js"></script>
 <script src="js/modules/travels.js"></script>
+<script src="js/modules/mission-control.js"></script>
+<script src="js/modules/crew-operations.js"></script>
+<script src="js/modules/user-management.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
