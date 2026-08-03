@@ -1,12 +1,9 @@
 {
-  "name": "Atlas Enterprise V3 Full Preview",
-  "short_name": "Atlas V3",
+  "name": "Atlas Enterprise V4",
+  "short_name": "Atlas",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f3f6fb",
-  "theme_color": "#0f172a",
-  "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png"}
-  ]
+  "background_color": "#eef2f5",
+  "theme_color": "#173451",
+  "icons": []
 }

@@ -1,0 +1,23 @@
+ATLAS V4 — ADD USER BUTTON FIX
+
+Cause:
+The Athena/Estimating build removed the old addEstimate button but app.js still called:
+  $("addEstimate").addEventListener(...)
+
+Because that element was null, JavaScript stopped before binding the Add User button.
+
+Corrected:
+- Optional buttons now use guarded event listeners.
+- Add User now opens the user form.
+- Missing optional controls can no longer stop the rest of Atlas from initializing.
+- Existing Athena, estimating, executive, finance, field operations, scheduler, weather, and Supabase user function remain unchanged.
+
+Installation:
+1. Stop the local server with Ctrl+C.
+2. Extract the Fix Only ZIP.
+3. Drop app.js and service-worker.js into the current V4 folder.
+4. Replace the existing files.
+5. Restart on a fresh port:
+   npx.cmd serve . -l 3015
+6. Open http://localhost:3015
+7. Press Ctrl+Shift+R.
