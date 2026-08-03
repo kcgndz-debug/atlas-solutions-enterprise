@@ -1,392 +1,468 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="icon-192.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0f172a">
-  <title>Atlas Enterprise V3 Full Preview</title>
+  <meta name="theme-color" content="#173451">
+  <title>Atlas Enterprise V4</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Atlas Login Screen -->
-<section id="atlasLoginScreen" class="atlas-login-screen">
-  <div class="atlas-login-card">
-    <img
-      src="assets/atlas-logo.jpg"
-      alt="Atlas Solutions"
-      class="atlas-login-logo"
-    >
+<div id="offlineBar" class="offline-bar hidden">Offline — Atlas will keep approved local changes queued.</div>
 
-    <div class="atlas-login-heading">
-      <h1>Atlas Enterprise</h1>
-      <p>Secure operations and estimating platform</p>
+<section id="authScreen" class="auth-shell">
+  <form id="authForm" class="auth-card">
+    <div class="brand-row">
+      <div class="brand-mark">A</div>
+      <div><strong>Atlas Enterprise</strong><small>Fence &amp; Railing Operating System</small></div>
     </div>
-
-    <form id="atlasLoginForm" class="atlas-login-form">
-      <label for="atlasLoginEmail">Email address</label>
-      <input
-        id="atlasLoginEmail"
-        name="email"
-        type="email"
-        autocomplete="email"
-        placeholder="name@company.com"
-        required
-      >
-
-      <label for="atlasLoginPassword">Password</label>
-
-      <div class="atlas-password-field">
-        <input
-          id="atlasLoginPassword"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Enter your password"
-          required
-        >
-
-        <button
-          id="atlasTogglePassword"
-          class="atlas-password-toggle"
-          type="button"
-          aria-label="Show password"
-        >
-          Show
-        </button>
-      </div>
-
-      <div id="atlasLoginMessage" class="atlas-login-message" role="alert"></div>
-
-      <button id="atlasLoginButton" class="atlas-login-button" type="submit">
-        Sign in
-      </button>
-    </form>
-
-    <p class="atlas-login-footer">
-      Authorized Atlas users only
-    </p>
-  </div>
+    <div id="environmentBadge" class="environment-badge">LOCAL / DEMO READY</div>
+    <h1>Sign in</h1>
+    <p>Use your Atlas company login.</p>
+    <label>Email<input id="authEmail" type="email" autocomplete="username" required></label>
+    <label>Password
+      <span class="password-wrap">
+        <input id="authPassword" type="password" autocomplete="current-password" minlength="8" required>
+        <button id="togglePassword" type="button" class="link-button">Show</button>
+      </span>
+    </label>
+    <button id="authSubmit" type="submit">Sign In</button>
+    <button id="demoLogin" type="button" class="secondary">Open Owner Demo</button>
+    <button id="forgotPassword" type="button" class="link-button standalone">Forgot password?</button>
+    <div id="authMessage" class="message hidden"></div>
+    <small class="muted center">Production accounts use Supabase. Demo records stay on this device.</small>
+  </form>
 </section>
-<div id="offlineBar" class="offline-bar hidden">Offline — changes are being saved locally.</div>
-<div id="atlasAppShell" class="app-shell atlas-auth-hidden">
+
+<div id="appShell" class="app-shell hidden">
   <aside class="sidebar">
-    <div class="brand atlas-sidebar-brand">
-
-    <img
-        src="assets/atlas-logo.jpg"
-        class="atlas-sidebar-logo"
-        alt="Atlas Solutions">
-
-    <div class="atlas-sidebar-brand-text">
-        <strong>Atlas Enterprise</strong>
-        <small id="atlasCurrentWorkspace">
-            Platform Owner
-        </small>
+    <div class="brand-row sidebar-brand">
+      <div class="brand-mark">A</div>
+      <div><strong>Atlas Enterprise</strong><small>V4 Foundation</small></div>
     </div>
-
-</div>
-    <nav>
+    <label class="workspace-label">Workspace
+      <select id="workspaceSelect"></select>
+    </label>
+    <nav id="mainNav">
       <button class="nav active" data-view="dashboard">Dashboard</button>
+      <button class="nav" data-view="executive" data-cap="executive">Owner / Executive</button>
       <button class="nav" data-view="mission">Mission Control</button>
-      <button class="nav" data-view="crew">Crew Operations</button>
-      <button class="nav" data-view="estimator">Estimator</button>
       <button class="nav" data-view="projects">Projects</button>
-      <button class="nav" data-view="customers">Customers</button>
-      <button class="nav" data-view="materials">Material Requests</button>
-      <button class="nav" data-view="documents">Documents</button>
+      <button class="nav" data-view="estimates">Estimating</button>
+      <button class="nav" data-view="schedule">Operations Scheduler</button>
+      <button class="nav" data-view="crews">Crew Operations</button>
       <button class="nav" data-view="field">Field Operations</button>
+      <button class="nav" data-view="materials">Material Requests</button>
+      <button class="nav" data-view="finance">Finance</button>
+      <button class="nav" data-view="users" data-cap="users">User Management</button>
+      <button class="nav" data-view="athena">Athena</button>
       <button class="nav" data-view="settings">Settings</button>
-      <button class="nav" data-view="users">User Management</button>
     </nav>
     <div class="sidebar-footer">
-      <label>Company
-        <select id="companySelect"><option>Delamere Industries</option><option>HDAV</option></select>
-      </label>
-      <div class="sync"><span id="syncDot"></span><span id="syncText">Saved locally</span></div>
-      <button id="atlasSignOutButton" class="secondary atlas-signout-button" type="button">Sign Out</button>
+      <div><strong id="sideUser">Atlas User</strong><small id="sideRole">Role</small></div>
+      <div class="sync-row"><span id="syncDot"></span><span id="syncText">Ready</span></div>
+      <button id="signOut" type="button" class="secondary">Sign Out</button>
     </div>
   </aside>
 
   <main>
     <header class="topbar">
-      <div><h1 id="pageTitle">Executive Dashboard</h1><p id="companyLabel">Delamere Industries workspace</p></div>
-      <div class="top-actions"><button id="installBtn" class="secondary hidden">Install App</button><button id="athenaBtn">Athena</button></div>
+      <div>
+        <p class="eyebrow" id="pageEyebrow">OPERATIONS</p>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="top-actions">
+        <div class="signed-user">
+          <span id="signedInitials" class="user-avatar">AU</span>
+          <div><strong id="signedName">Atlas User</strong><small id="signedEmail"></small></div>
+        </div>
+        <span id="roleBadge" class="badge">Role</span>
+        <button id="installBtn" class="secondary hidden" type="button">Install App</button>
+      </div>
     </header>
 
     <section id="dashboard" class="view active">
+      <article class="hero-card">
+        <div>
+          <p class="eyebrow">DAILY OPERATING BRIEF</p>
+          <h2 id="smartGreeting">Good evening, Atlas User</h2>
+          <p id="dailyBrief">Your operation is ready for review.</p>
+        </div>
+        <div class="hero-actions">
+          <button type="button" data-view-target="schedule">Open Schedule</button>
+          <button type="button" class="secondary" data-view-target="projects">View Projects</button>
+        </div>
+      </article>
       <div class="metric-grid">
-        <article class="metric"><span>Pipeline</span><strong id="mPipeline">$0.00</strong><small id="mBidCount">0 estimates</small></article>
-        <article class="metric"><span>Projects</span><strong id="mProjects">0</strong><small>Active records</small></article>
-        <article class="metric"><span>Material Requests</span><strong id="mMaterials">0</strong><small>Open requests</small></article>
-        <article class="metric"><span>Installed</span><strong id="mInstalled">0 LF</strong><small>Field reported</small></article>
+        <article class="metric"><span>Active Projects</span><strong id="mProjects">0</strong><small id="mProjectsSub">Across all PMs</small></article>
+        <article class="metric"><span>Current Bids</span><strong id="mBids">0</strong><small id="mBidValue">$0 pipeline</small></article>
+        <article class="metric"><span>Crews Working</span><strong id="mCrews">0</strong><small id="mCrewSub">0 available</small></article>
+        <article class="metric"><span>Outstanding</span><strong id="mOutstanding">$0</strong><small>Open receivables</small></article>
       </div>
       <div class="two-col">
-        <article class="panel"><div class="panel-head"><h2>Recent Estimates</h2><button class="link" data-open-estimator>New Estimate</button></div><div id="recentEstimates"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Atlas Alerts</h2></div><div id="alerts"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">TODAY</p><h3>Upcoming Work</h3></div></div><div id="dashboardSchedule"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">WORKFORCE</p><h3>Crew Readiness</h3></div></div><div id="dashboardCrews"></div></article>
       </div>
       <div class="two-col">
-        <article class="panel"><div class="panel-head"><h2>Active Projects</h2><button class="link" data-view-target="projects">View All</button></div><div id="dashboardProjects"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Open Material Requests</h2><button class="link" data-view-target="materials">View All</button></div><div id="dashboardMaterials"></div></article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">PROJECT WEATHER</p><h3>Location Conditions</h3></div></div>
+          <label>Project<select id="dashboardWeatherProject"></select></label>
+          <div id="dashboardWeatherCard" class="weather-card"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">FIELD STATUS</p><h3>Latest Crew Reports</h3></div><button class="link-button" data-view-target="field">Open Field Operations</button></div>
+          <div id="dashboardFieldReports"></div>
+        </article>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">PROJECT MANAGEMENT</p><h3>PM Workload</h3></div><button class="link-button" data-view-target="projects">All Projects</button></div>
+        <div id="pmWorkload" class="pm-grid"></div>
+      </article>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><h3>Priority Alerts</h3></div><div id="dashboardAlerts"></div></article>
+        <article class="panel"><div class="panel-head"><h3>Recent Activity</h3></div><div id="activityFeed"></div></article>
       </div>
     </section>
 
+    
+    <section id="executive" class="view">
+      <div class="section-head">
+        <div><p class="eyebrow">OWNER / EXECUTIVE COMMAND</p><h2>Executive Overview</h2><p>Company-wide visibility across projects, project managers, crews, bids, finance, materials, field operations, and risk.</p></div>
+        <button id="refreshExecutive" type="button">Refresh Executive View</button>
+      </div>
+      <div class="metric-grid executive-metrics">
+        <article class="metric"><span>Active Contract Value</span><strong id="xActiveValue">$0</strong><small id="xActiveProjects">0 active projects</small></article>
+        <article class="metric"><span>Total Paid</span><strong id="xPaid">$0</strong><small id="xPaidPercent">0% collected</small></article>
+        <article class="metric"><span>Total Outstanding</span><strong id="xOwed">$0</strong><small>Across all active contracts</small></article>
+        <article class="metric"><span>Bid Pipeline</span><strong id="xPipeline">$0</strong><small id="xBidCount">0 current bids</small></article>
+        <article class="metric"><span>Crews Deployed</span><strong id="xCrews">0</strong><small id="xCrewAvailable">0 available</small></article>
+        <article class="metric"><span>Projects at Risk</span><strong id="xRisk">0</strong><small>Needs executive attention</small></article>
+        <article class="metric"><span>Critical Materials</span><strong id="xCriticalMaterials">0</strong><small>Open critical requests</small></article>
+        <article class="metric"><span>Schedule Conflicts</span><strong id="xConflicts">0</strong><small>Double-booked crews</small></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">PROJECT MANAGER PERFORMANCE</p><h3>Portfolio by PM</h3></div></div><div id="executivePmTable" class="table-wrap"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">EXECUTIVE ATTENTION</p><h3>Priority Decisions</h3></div></div><div id="executiveAttention"></div></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">CASH POSITION</p><h3>Paid vs. Outstanding by PM</h3></div></div><div id="executiveCashByPm" class="executive-bars"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">OPERATIONS</p><h3>Crews and Schedule</h3></div></div><div id="executiveCrewStatus"></div></article>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">COMPANY PORTFOLIO</p><h3>All Active Projects</h3></div></div>
+        <div class="table-wrap"><table><thead><tr><th>PM</th><th>Project</th><th>Location</th><th>Status</th><th>Progress</th><th>Contract</th><th>Paid</th><th>Owed</th></tr></thead><tbody id="executiveProjectRows"></tbody></table></div>
+      </article>
+    </section>
 
     <section id="mission" class="view">
-      <div class="section-actions">
-        <div><h2>Mission Control</h2><p>Live company operations, project health, workload, and field activity.</p></div>
-        <div class="button-row"><button id="addMissionActivity">Log Activity</button><button id="refreshMission" class="secondary">Refresh</button></div>
-      </div>
-      <div class="metric-grid mission-metrics">
-        <article class="metric"><span>Contract Backlog</span><strong id="mcBacklog">$0.00</strong><small>Open project value</small></article>
-        <article class="metric"><span>Healthy Projects</span><strong id="mcHealthy">0</strong><small>Operating normally</small></article>
-        <article class="metric"><span>Projects at Risk</span><strong id="mcAtRisk">0</strong><small>Need management attention</small></article>
-        <article class="metric"><span>Crews Reporting</span><strong id="mcCrews">0</strong><small>Field reports today</small></article>
-      </div>
-      <div class="two-col mission-layout">
-        <article class="panel">
-          <div class="panel-head"><div><h3>Project Health</h3><p>Calculated from workflow, materials, reports, and next actions.</p></div></div>
-          <div id="missionProjectHealth" class="mission-project-list"></div>
-        </article>
-        <article class="panel">
-          <div class="panel-head"><div><h3>Live Activity</h3><p>Newest operational updates first.</p></div></div>
-          <div id="missionActivity" class="mission-activity"></div>
-        </article>
-      </div>
-      <div class="two-col">
-        <article class="panel"><div class="panel-head"><div><h3>PM Workload</h3><p>Active assignments and value by project manager.</p></div></div><div id="missionWorkload"></div></article>
-        <article class="panel"><div class="panel-head"><div><h3>Action Queue</h3><p>Items that should be handled next.</p></div></div><div id="missionActions"></div></article>
-      </div>
-    </section>
-
-
-    <section id="crew" class="view">
-      <div class="section-actions">
-        <div><h2>Crew Operations</h2><p>Field assignments, time, daily production, safety, photos, materials, and equipment.</p></div>
-        <div class="button-row"><button id="openCrewReport">Daily Report</button><button id="openCrewPhoto" class="secondary">Add Photo</button><button id="openCrewMaterial" class="secondary">Material Request</button></div>
-      </div>
+      <div class="section-head"><div><p class="eyebrow">COMPANY OPERATIONS</p><h2>Mission Control</h2><p>Project health, crew deployment, materials, and attention items.</p></div><button id="refreshMission" type="button">Refresh</button></div>
       <div class="metric-grid">
-        <article class="metric"><span>Active Jobs</span><strong id="crewMetricJobs">0</strong><small>Available to field crews</small></article>
-        <article class="metric"><span>Installed Today</span><strong id="crewMetricInstalled">0 LF</strong><small>Daily report production</small></article>
-        <article class="metric"><span>Photos Today</span><strong id="crewMetricPhotos">0</strong><small>Progress and issue records</small></article>
-        <article class="metric"><span>Open Requests</span><strong id="crewMetricRequests">0</strong><small>Materials awaiting action</small></article>
-      </div>
-      <article class="panel crew-clock-panel">
-        <div class="panel-head"><div><h3>Field Clock</h3><p>Clock the active crew into a project and record field hours.</p></div><div id="crewClockStatus" class="crew-clock-status"></div></div>
-        <div class="crew-clock-controls"><label>Project<select id="crewClockProject" data-crew-project-select></select></label><button id="crewClockButton" type="button">Clock In</button></div>
-      </article>
-      <article class="panel"><div class="panel-head"><div><h3>Today's Jobs</h3><p>Open field assignments and one-touch crew actions.</p></div><button id="openCrewSafety" class="secondary">Safety Checklist</button></div><div id="crewAssignments" class="crew-job-grid"></div></article>
-      <div class="two-col">
-        <article class="panel"><div class="panel-head"><div><h3>Recent Daily Reports</h3><p>Production, crew hours, delays, and notes.</p></div></div><div id="crewRecentReports"></div></article>
-        <article class="panel"><div class="panel-head"><div><h3>Safety Status</h3><p>Today's completed field safety checks.</p></div></div><div id="crewSafetyStatus"></div></article>
+        <article class="metric"><span>At Risk</span><strong id="missionRisk">0</strong></article>
+        <article class="metric"><span>Unassigned Work</span><strong id="missionUnassigned">0</strong></article>
+        <article class="metric"><span>Critical Materials</span><strong id="missionMaterials">0</strong></article>
+        <article class="metric"><span>Schedule Conflicts</span><strong id="missionConflicts">0</strong></article>
       </div>
       <div class="two-col">
-        <article class="panel"><div class="panel-head"><div><h3>Photo Timeline</h3><p>Progress, issue, safety, and completion photos.</p></div></div><div id="crewPhotoTimeline" class="crew-photo-grid"></div></article>
-        <article class="panel"><div class="panel-head"><div><h3>Equipment</h3><p>Field checkout, assignment, and return status.</p></div><button id="openCrewEquipment" class="secondary">Check Out Equipment</button></div><div id="crewEquipmentList"></div></article>
+        <article class="panel"><h3>Project Health</h3><div id="missionProjects"></div></article>
+        <article class="panel"><h3>Operational Attention</h3><div id="missionAttention"></div></article>
       </div>
-    </section>
-
-    <section id="estimator" class="view">
-      <div class="section-actions">
-        <div><h2>Atlas Estimator</h2><p>Base and adders first, profit last, final customer pricing after rounding.</p></div>
-        <div class="button-row"><button id="saveEstimate">Save Estimate</button><button id="printEstimate" class="secondary">Print / PDF</button></div>
-      </div>
-      <article class="panel">
-        <div class="panel-head"><div><h3>Saved Estimates</h3><p>Click to reopen, duplicate, or delete a saved quote.</p></div><input id="searchEstimates" class="search" placeholder="Search estimates"></div>
-        <div id="estimateList" class="entity-list"></div>
-      </article>
-      <article class="panel">
-        <h3>Project & Scope</h3>
-        <div class="form-grid">
-          <label>Project Name<input id="projectName" placeholder="Project name"></label>
-          <label>Customer<input id="customer" placeholder="Customer"></label>
-          <label>Location<input id="location" placeholder="City / County"></label>
-          <label>Estimate Type<select id="quoteType"><option>Full Install</option><option>Material Only</option></select></label>
-        </div>
-      </article>
-      <article class="panel">
-        <div class="panel-head"><div><h3>Estimate Items</h3><p>Add rail, fence, gate, labor, material, or custom items.</p></div><button id="addItem">+ Add Item</button></div>
-        <div id="estimateItems" class="item-list"></div>
-      </article>
-      <article class="panel">
-        <div class="panel-head"><div><h3>Travel & Mobilization</h3><p>Applied once per estimate.</p></div><button id="openMaps" class="secondary">Open Google Maps</button></div>
-        <div class="form-grid">
-          <label class="wide">Project Address<input id="travelAddress" placeholder="Full project address"></label>
-          <label>One-Way Miles<input id="oneWayMiles" type="number" min="0" step="0.1" value="0"></label>
-          <label class="check"><input id="roundTrip" type="checkbox" checked> Round Trip</label>
-          <label>Mileage Rate<input id="mileageRate" type="number" min="0" step="0.01" value="2.50"></label>
-          <label class="check"><input id="fieldVerificationEnabled" type="checkbox"> Field Verification</label>
-          <label>Verification Type<select id="fieldVerificationOption"><option value="350">Local under 1 hour each way ($350)</option><option value="650">Regional 1–3 hours each way ($650)</option><option value="950">Long distance over 3 hours each way ($950)</option><option value="custom">Custom charge</option></select></label>
-          <label>Field Charge<input id="fieldVerificationCharge" type="number" min="0" value="350"></label>
-          <label>Travel Labor<select id="travelLaborType"><option value="none">None</option><option value="half-day">Half Day</option><option value="full-day">Full Day</option><option value="custom">Custom</option></select></label>
-          <label>Custom Travel Labor<input id="customTravelLabor" type="number" min="0" value="0"></label>
-          <label class="check"><input id="overnightStay" type="checkbox"> Overnight Stay</label>
-          <label>Hotel Nights<input id="hotelNights" type="number" min="0" value="0"></label>
-          <label>Hotel Rate<input id="hotelRate" type="number" min="0" value="1000"></label>
-          <label>Per Diem Days<input id="perDiemDays" type="number" min="0" value="0"></label>
-          <label>Per Diem Rate<input id="perDiemRate" type="number" min="0" value="0"></label>
-          <label>Tolls<input id="tolls" type="number" min="0" step="0.01" value="0"></label>
-          <label>Parking<input id="parking" type="number" min="0" step="0.01" value="0"></label>
-          <label>Miscellaneous<input id="miscellaneous" type="number" min="0" step="0.01" value="0"></label>
-          <label class="check"><input id="manualOverrideEnabled" type="checkbox"> Manual Travel Override</label>
-          <label>Override Total<input id="manualOverrideTotal" type="number" min="0" step="0.01" value="0"></label>
-        </div>
-        <div id="travelSummary" class="summary-grid"></div>
-      </article>
-      <article class="panel">
-        <h3>Estimate Summary</h3>
-        <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead><tbody id="breakdown"></tbody></table></div>
-        <div class="totals">
-          <div><span>Item Subtotal</span><strong id="itemSubtotal">$0.00</strong></div>
-          <div><span>Travel & Mobilization</span><strong id="travelTotal">$0.00</strong></div>
-          <div><span>Sales Tax / Fee</span><strong id="taxTotal">$0.00</strong></div>
-          <div><span>Profit</span><strong id="profitTotal">$0.00</strong></div>
-          <div class="grand"><span>Grand Total</span><strong id="finalTotal">$0.00</strong></div>
-        </div>
-      </article>
     </section>
 
     <section id="projects" class="view">
-      <div class="section-actions"><div><h2>Projects</h2><p>Company-scoped project records.</p></div><div class="search-row"><button id="addProject">Add Project</button><input id="searchProjects" class="search" placeholder="Search projects"></div></div>
-      <div id="projectList" class="card-grid"></div>
+      <div class="section-head"><div><p class="eyebrow">PROJECT PORTFOLIO</p><h2>Projects</h2><p>Search and review work across all project managers.</p></div><button id="addProject" type="button">+ Project</button></div>
+      <article class="panel filter-bar">
+        <input id="projectSearch" placeholder="Search project, PM, customer, or location">
+        <select id="projectPmFilter"><option value="">All Project Managers</option></select>
+        <select id="projectStatusFilter"><option value="">All Statuses</option></select>
+      </article>
+      <div id="projectList" class="project-grid"></div>
     </section>
 
-    <section id="customers" class="view">
-      <div class="section-actions"><div><h2>Customers</h2><p>Customer and contact records.</p></div><div class="search-row"><button id="addCustomer">Add Customer</button><input id="searchCustomers" class="search" placeholder="Search customers"></div></div>
-      <div id="customerList" class="card-grid"></div>
+    
+    <section id="estimates" class="view">
+      <div class="section-head">
+        <div><p class="eyebrow">BID DEVELOPMENT</p><h2>Estimating</h2><p>Build Atlas estimates from quantity, production, travel, materials, labor, adders, and profit.</p></div>
+        <div class="button-row"><button id="newEstimateCalc" type="button" class="secondary">Clear Calculator</button><button id="saveEstimateCalc" type="button">Save Estimate</button></div>
+      </div>
+
+      <div class="estimate-builder">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">ESTIMATE INPUTS</p><h3>Project &amp; Scope</h3></div><span class="badge" id="estimateFormulaBadge">Atlas Formula</span></div>
+          <div class="form-grid">
+            <label class="wide">Estimate Name<input id="calcName" placeholder="Project or bid name"></label>
+            <label>Customer<input id="calcCustomer" placeholder="Customer"></label>
+            <label>Location<input id="calcLocation" placeholder="City / County"></label>
+            <label>Project Manager<select id="calcPm"></select></label>
+            <label>Estimate Status<select id="calcStatus"><option>Open</option><option>Submitted</option><option>Won</option><option>Lost</option></select></label>
+            <label>System / Product<select id="calcProduct">
+              <option value="870">870 Aluminum Two-Rail</option>
+              <option value="880">880 Steel Two-Rail</option>
+              <option value="822">822 Bullet Rail</option>
+              <option value="862">862 Type 1 Picket</option>
+              <option value="852">852 Sunshine Infill</option>
+              <option value="retrofit">Retrofit Rail</option>
+              <option value="typeb">Type B Chain Link</option>
+              <option value="custom">Custom</option>
+            </select></label>
+            <label class="wide">Scope Description<input id="calcScope" placeholder="Description of work"></label>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">CORE CALCULATION</p><h3>Quantity &amp; Base Cost</h3></div></div>
+          <div class="form-grid">
+            <label>Quantity (LF / EA)<input id="calcQty" type="number" min="0" step="0.01" value="1000"></label>
+            <label>Base Cost per Unit<input id="calcBase" type="number" min="0" step="0.01" value="35"></label>
+            <label>Production per Crew-Day<input id="calcProduction" type="number" min="1" step="1" value="400"></label>
+            <label>Labor per Crew-Day<input id="calcLaborRate" type="number" min="0" step="0.01" value="1500"></label>
+            <label>Travel Labor Days<input id="calcTravelDays" type="number" min="0" step="0.5" value="0"></label>
+            <label>Travel Labor Rate<input id="calcTravelRate" type="number" min="0" step="0.01" value="750"></label>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">TRAVEL &amp; MOBILIZATION</p><h3>Mileage, Hotel &amp; Equipment</h3></div></div>
+          <div class="form-grid">
+            <label>Total Mileage<input id="calcMiles" type="number" min="0" step="1" value="0"></label>
+            <label>Mileage Rate<input id="calcMileageRate" type="number" min="0" step="0.01" value="2.5"></label>
+            <label>Hotel Nights<input id="calcHotelNights" type="number" min="0" step="1" value="0"></label>
+            <label>Hotel Rate<input id="calcHotelRate" type="number" min="0" step="0.01" value="1000"></label>
+            <label>Equipment / Mobilization<input id="calcEquipment" type="number" min="0" step="0.01" value="0"></label>
+            <label>Permit / Other<input id="calcPermit" type="number" min="0" step="0.01" value="0"></label>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">ADDERS</p><h3>Hoops, Ends &amp; Finish</h3></div></div>
+          <div class="form-grid">
+            <label>Hoop Quantity<input id="calcHoopQty" type="number" min="0" step="1" value="2"></label>
+            <label>Hoop Price Each<input id="calcHoopPrice" type="number" min="0" step="0.01" value="100"></label>
+            <label>Mitered Ends<input id="calcMiterQty" type="number" min="0" step="1" value="0"></label>
+            <label>Mitered End Price<input id="calcMiterPrice" type="number" min="0" step="0.01" value="600"></label>
+            <label>Finish / Coating Adder<input id="calcFinishAdder" type="number" min="0" step="0.01" value="0"></label>
+            <label>Additional Direct Costs<input id="calcDirectAdder" type="number" min="0" step="0.01" value="0"></label>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">PRICING</p><h3>Profit &amp; Tax</h3></div></div>
+          <div class="form-grid">
+            <label>Profit Method<select id="calcProfitMethod"><option value="perunit">Profit per Unit</option><option value="percent">Profit Percentage</option><option value="lump">Lump Sum Profit</option></select></label>
+            <label>Profit Value<input id="calcProfitValue" type="number" min="0" step="0.01" value="10"></label>
+            <label>Sales Tax %<input id="calcTaxRate" type="number" min="0" step="0.01" value="0"></label>
+            <label>Tax Application<select id="calcTaxMode"><option value="none">No Tax / F&amp;I</option><option value="materials">Materials Only</option><option value="all">Entire Estimate</option></select></label>
+            <label>Final Unit Rounding<select id="calcRounding"><option value="whole">Whole Dollar</option><option value="none">No Rounding</option><option value="up">Always Round Up</option><option value="down">Always Round Down</option></select></label>
+            <label>Quote Type<select id="calcQuoteType"><option>F&amp;I</option><option>Materials Only</option><option>Labor Only</option></select></label>
+          </div>
+        </article>
+
+        <article class="panel estimate-results-panel">
+          <div class="panel-head"><div><p class="eyebrow">ATLAS ESTIMATE RESULT</p><h3>Calculated Price</h3></div><button id="copyEstimateSummary" type="button" class="secondary">Copy Summary</button></div>
+          <div class="estimate-result-hero">
+            <div><span>Final Sell Price</span><strong id="calcFinalTotal">$0</strong></div>
+            <div><span>Sell Price per Unit</span><strong id="calcFinalUnit">$0</strong></div>
+          </div>
+          <div id="calcBreakdown" class="estimate-breakdown"></div>
+          <div class="formula-box">
+            <strong>Formula sequence</strong>
+            <small id="calcFormulaText">Base + adders + labor + travel + equipment + profit + applicable tax → final rounding</small>
+          </div>
+        </article>
+      </div>
+
+      <div class="section-head estimate-history-head">
+        <div><p class="eyebrow">ESTIMATE PIPELINE</p><h2>Saved Estimates</h2></div>
+      </div>
+      <div class="metric-grid">
+        <article class="metric"><span>Open Estimates</span><strong id="eOpen">0</strong></article>
+        <article class="metric"><span>Submitted Value</span><strong id="eSubmitted">$0</strong></article>
+        <article class="metric"><span>Won Value</span><strong id="eWon">$0</strong></article>
+        <article class="metric"><span>Win Rate</span><strong id="eWinRate">0%</strong></article>
+      </div>
+      <article class="panel filter-bar">
+        <input id="estimateSearch" placeholder="Search estimate, customer, location, or PM">
+        <select id="estimateStatusFilter"><option value="">All Statuses</option></select>
+        <select id="estimatePmFilter"><option value="">All Project Managers</option></select>
+      </article>
+      <div id="estimateList" class="estimate-grid"></div>
+    </section>
+
+    <section id="schedule" class="view">
+      <div class="section-head"><div><p class="eyebrow">OPERATIONS INTELLIGENCE</p><h2>Operations Scheduler</h2><p>Assign crews, color-code work, and prevent accidental double-booking.</p></div><button id="addScheduleItem" type="button">+ Schedule Work</button></div>
+      <article class="panel scheduler-toolbar">
+        <div class="button-row"><button id="schedulerPrev" class="secondary" type="button">← Previous</button><button id="schedulerToday" class="secondary" type="button">Today</button><button id="schedulerNext" class="secondary" type="button">Next →</button></div>
+        <div class="date-jump"><label>Go to week<input id="schedulerDate" type="date"></label><button id="schedulerGo" type="button" class="secondary">Go</button></div>
+        <div class="schedule-color-legend" aria-label="Schedule color legend">
+          <span><i class="color-dot none"></i>No color</span>
+          <span><i class="color-dot red"></i>Red</span>
+          <span><i class="color-dot blue"></i>Blue</span>
+          <span><i class="color-dot green"></i>Green</span>
+        </div>
+        <strong id="schedulerLabel"></strong>
+      </article>
+      <div id="schedulerGrid" class="scheduler-grid"></div>
+    </section>
+
+    <section id="crews" class="view">
+      <div class="section-head"><div><p class="eyebrow">FIELD OPERATIONS</p><h2>Crew Operations</h2><p>People, vehicles, readiness, and active assignments.</p></div><button id="addCrew" type="button">+ Create Crew</button></div>
+      <div id="crewList" class="crew-grid"></div>
+    </section>
+
+    
+    <section id="field" class="view">
+      <div class="section-head">
+        <div><p class="eyebrow">CREW FIELD OPERATIONS</p><h2>Field Operations</h2><p>Daily production, safety, equipment, supplies, photos, and issues from the field.</p></div>
+        <button id="addFieldReport" type="button">+ Daily Field Report</button>
+      </div>
+      <div class="metric-grid">
+        <article class="metric"><span>Reports Today</span><strong id="fieldReportsToday">0</strong></article>
+        <article class="metric"><span>Open Issues</span><strong id="fieldOpenIssues">0</strong></article>
+        <article class="metric"><span>Crews Reporting</span><strong id="fieldCrewsReporting">0</strong></article>
+        <article class="metric"><span>Photos Logged</span><strong id="fieldPhotos">0</strong></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">DAILY REPORTS</p><h3>Recent Field Activity</h3></div></div><div id="fieldReportList"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">CREW READINESS</p><h3>Equipment &amp; Supply Status</h3></div></div><div id="fieldReadinessList"></div></article>
+      </div>
     </section>
 
     <section id="materials" class="view">
-      <div class="section-actions"><div><h2>Material Requests</h2><p>Field-to-purchasing requests with status tracking.</p></div><div class="search-row"><button id="addMaterialRequest">New Request</button><input id="searchMaterials" class="search" placeholder="Search requests"></div></div>
-      <div id="materialList" class="card-grid"></div>
+      <div class="section-head"><div><p class="eyebrow">PROCUREMENT</p><h2>Material Requests</h2></div><button id="addMaterial" type="button">+ Request</button></div>
+      <article class="panel"><div id="materialList"></div></article>
     </section>
 
-    <section id="documents" class="view">
-      <div class="section-actions"><div><h2>Documents</h2><p>RFIs, submittals, POs, and change orders.</p></div><div class="search-row"><button id="addDocument">Add Document</button><input id="searchDocuments" class="search" placeholder="Search documents"></div></div>
-      <div id="documentList"></div>
+    <section id="finance" class="view">
+      <div class="section-head">
+        <div><p class="eyebrow">COMPANY FINANCE</p><h2>Financial Overview</h2><p>Check each project manager’s contracts, paid amounts, balances owed, and running totals.</p></div>
+      </div>
+      <div class="metric-grid">
+        <article class="metric"><span>Total Contract Value</span><strong id="fContract">$0</strong></article>
+        <article class="metric"><span>Total Paid</span><strong id="fPaid">$0</strong></article>
+        <article class="metric"><span>Total Outstanding</span><strong id="fOutstanding">$0</strong></article>
+        <article class="metric"><span>Bid Pipeline</span><strong id="fPipeline">$0</strong></article>
+      </div>
+      <article class="panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">PROJECT MANAGER TOTALS</p><h3>Contract, Paid &amp; Owed by PM</h3></div>
+          <label>Project Manager<select id="financePmFilter"><option value="">All Project Managers</option></select></label>
+        </div>
+        <div id="financePmSummary" class="finance-pm-grid"></div>
+      </article>
+      <article class="panel table-wrap">
+        <table>
+          <thead><tr><th>Project Manager</th><th>Project</th><th>Contract</th><th>Paid</th><th>Owed</th><th>Running Contract</th><th>Running Paid</th><th>Running Owed</th><th>Status</th></tr></thead>
+          <tbody id="financeRows"></tbody>
+        </table>
+      </article>
     </section>
-
-    <section id="field" class="view">
-      <div class="section-actions"><div><h2>Field Operations</h2><p>Daily updates and installed quantities.</p></div><div class="search-row"><button id="addFieldReport">Add Field Report</button><input id="searchFieldReports" class="search" placeholder="Search reports"></div></div>
-      <div id="fieldList" class="card-grid"></div>
-    </section>
-
 
     <section id="users" class="view">
-      <div class="page-head"><div><p class="eyebrow">Administration</p><h1>User Management</h1><p>Assign company roles and project access. Production user creation and password resets are performed through Supabase.</p></div><button id="addDemoUser" data-permission="users.manage">Add Demo User</button></div>
-      <div class="permission-summary" id="permissionSummary"></div>
-      <div class="panel"><div class="panel-head"><h2>Role Access Matrix</h2></div><div class="table-wrap"><table class="access-table"><thead><tr><th>Role</th><th>Primary Workspace</th><th>Project Scope</th><th>Administration</th></tr></thead><tbody id="roleMatrixBody"></tbody></table></div></div>
-      <div class="panel"><div class="panel-head"><h2>Workspace Users</h2><span class="muted">Local demonstration records</span></div><div id="atlasUserList"></div></div>
+      <div class="section-head">
+        <div><p class="eyebrow">ACCESS &amp; ACCOUNTABILITY</p><h2>User Management</h2><p>Create logins, assign companies, and give each person the correct privileges.</p></div>
+        <div class="button-row"><button id="refreshUsers" class="secondary" type="button">Refresh</button><button id="inviteUser" type="button">+ Add User</button></div>
+      </div>
+      <div id="userAdminStatus" class="status-banner hidden"></div>
+      <div class="metric-grid">
+        <article class="metric"><span>Active Users</span><strong id="uActive">0</strong></article>
+        <article class="metric"><span>Pending</span><strong id="uPending">0</strong></article>
+        <article class="metric"><span>Owners / Admins</span><strong id="uAdmins">0</strong></article>
+        <article class="metric"><span>Project Managers</span><strong id="uPMs">0</strong></article>
+      </div>
+      <article class="panel table-wrap">
+        <table><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="userRows"></tbody></table>
+      </article>
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">PRIVILEGE MODEL</p><h3>Role Access</h3></div></div>
+        <div id="roleCards" class="role-grid"></div>
+      </article>
     </section>
+
+    
+    <section id="athena" class="view">
+      <div class="section-head">
+        <div><p class="eyebrow">ATLAS INTELLIGENCE</p><h2>Athena</h2><p>Your guided operating assistant for onboarding, daily priorities, estimating, scheduling, field operations, finance, and user administration.</p></div>
+        <div class="button-row"><button id="startAthenaTour" type="button">Start Full Walkthrough</button><button id="athenaDailyBriefBtn" class="secondary" type="button">Refresh Daily Brief</button></div>
+      </div>
+      <article class="athena-hero">
+        <div class="athena-orb">A</div>
+        <div>
+          <p class="eyebrow">ATHENA DAILY BRIEF</p>
+          <h2 id="athenaGreeting">Good evening, Kendall</h2>
+          <p id="athenaBriefText">Athena is reviewing your operations.</p>
+        </div>
+      </article>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">RECOMMENDED ACTIONS</p><h3>What Needs Attention</h3></div></div><div id="athenaRecommendations"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">QUICK GUIDES</p><h3>Learn Atlas</h3></div></div><div class="athena-guide-grid">
+          <button class="athena-guide" data-athena-tour="dashboard"><strong>Dashboard</strong><small>Daily operating brief and PM workload</small></button>
+          <button class="athena-guide" data-athena-tour="executive"><strong>Owner / Executive</strong><small>Company-wide finance and risk</small></button>
+          <button class="athena-guide" data-athena-tour="estimates"><strong>Estimating</strong><small>Formula-driven quote builder</small></button>
+          <button class="athena-guide" data-athena-tour="schedule"><strong>Scheduling</strong><small>Multi-day work, colors, and conflicts</small></button>
+          <button class="athena-guide" data-athena-tour="field"><strong>Field Operations</strong><small>Daily reports, equipment, and supplies</small></button>
+          <button class="athena-guide" data-athena-tour="finance"><strong>Finance</strong><small>Contract, paid, owed, and running totals</small></button>
+          <button class="athena-guide" data-athena-tour="users"><strong>User Management</strong><small>Logins, roles, and privileges</small></button>
+        </div></article>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">ASK ATHENA</p><h3>Operational Guidance</h3></div></div>
+        <div class="athena-chat">
+          <div id="athenaChatLog" class="athena-chat-log"><div class="athena-message"><strong>Athena</strong><p>Ask me how to use a module, what needs attention, or how Atlas calculated an estimate.</p></div></div>
+          <form id="athenaChatForm" class="athena-chat-form"><input id="athenaQuestion" placeholder="Ask Athena a question"><button type="submit">Ask</button></form>
+        </div>
+      </article>
+    </section>
+
     <section id="settings" class="view">
-      <article class="panel"><h2>Settings</h2><p>This full preview saves locally and works offline. Firebase synchronization and role-based permissions can be connected after this workflow is approved.</p></article>
+      <div class="section-head"><div><p class="eyebrow">SYSTEM</p><h2>Settings</h2></div></div>
+      <div class="two-col">
+        <article class="panel">
+          <h3>Environment</h3>
+          <p id="environmentStatus"></p>
+          <button id="resetDemoData" type="button" class="secondary">Reset Demo Data</button>
+        </article>
+        <article class="panel">
+          <h3>Account</h3>
+          <form id="profileForm" class="form-grid">
+            <label>First Name<input id="profileFirstName"></label>
+            <label>Last Name<input id="profileLastName"></label>
+            <label class="wide">Display Name<input id="profileDisplayName"></label>
+            <button type="submit">Save Profile</button>
+          </form>
+        </article>
+      </div>
     </section>
   </main>
 </div>
 
-<div id="athenaPanel" class="athena">
-  <div class="athena-head"><div><strong>Athena</strong><span>Atlas Assistant</span></div><button id="closeAthena">×</button></div>
-  <div id="athenaMessages" class="athena-messages"><div class="bot">I can summarize estimates, projects, material requests, and alerts.</div></div>
-  <form id="athenaForm"><input id="athenaInput" placeholder="Ask about estimates, projects, or requests"><button>Send</button></form>
+<button id="athenaFloatingButton" class="athena-floating-button" type="button" aria-label="Open Athena">A</button>
+<div id="athenaTourOverlay" class="athena-tour-overlay hidden">
+  <div class="athena-tour-card">
+    <div class="athena-tour-head"><div class="athena-orb small">A</div><div><p class="eyebrow">ATHENA WALKTHROUGH</p><h3 id="athenaTourTitle">Welcome to Atlas</h3></div></div>
+    <p id="athenaTourText"></p>
+    <div class="athena-tour-progress"><span id="athenaTourProgress"></span></div>
+    <div class="dialog-actions"><button id="athenaTourClose" class="secondary" type="button">Exit Tour</button><div class="button-row"><button id="athenaTourBack" class="secondary" type="button">Back</button><button id="athenaTourNext" type="button">Next</button></div></div>
+  </div>
 </div>
 
-<div id="printQuote" class="print-quote hidden"></div>
-
-<dialog id="missionActivityDialog" class="atlas-dialog">
-  <form id="missionActivityForm" method="dialog">
-    <div class="dialog-head"><div><h3>Log Operational Activity</h3><p>Add a company-wide update to Mission Control.</p></div><button type="button" class="dialog-close" data-close-mission-dialog>×</button></div>
-    <div class="dialog-body form-grid">
-      <label>Activity Type<select id="missionActivityType"><option>Project Update</option><option>Crew Update</option><option>Material Update</option><option>Finance Update</option><option>Safety Update</option></select></label>
-      <label>Project<select id="missionActivityProject"></select></label>
-      <label class="wide">Update<textarea id="missionActivityMessage" rows="4" placeholder="What changed?" required></textarea></label>
-    </div>
-    <div class="dialog-actions"><button type="button" class="secondary" data-close-mission-dialog>Cancel</button><button type="submit">Save Activity</button></div>
+<dialog id="recordDialog">
+  <form id="recordForm">
+    <div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">ATLAS</p><h2 id="dialogTitle">Add Record</h2></div><button id="dialogClose" type="button" class="secondary">Close</button></div>
+    <div id="dialogFields" class="form-grid"></div>
+    <div id="dialogMessage" class="message hidden"></div>
+    <div class="dialog-actions"><span></span><button id="dialogSave" type="submit">Save</button></div>
   </form>
 </dialog>
 
-
-<dialog id="crewReportDialog" class="atlas-dialog">
-  <form id="crewReportForm">
-    <div class="dialog-head"><div><h3>Submit Daily Report</h3><p>Record today's crew production and field conditions.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
-    <div class="dialog-grid">
-      <label>Project<select id="crewReportProject" data-crew-project-select required></select></label>
-      <label>Crew Lead<input id="crewReportLead" placeholder="Crew lead"></label>
-      <label>Crew Count<input id="crewReportCount" type="number" min="1" value="3" required></label>
-      <label>Total Crew Hours<input id="crewReportHours" type="number" min="0" step="0.25" value="8" required></label>
-      <label>Installed LF<input id="crewReportInstalled" type="number" min="0" step="1" value="0"></label>
-      <label>Materials Used<input id="crewReportMaterials" placeholder="Posts, rail, concrete..."></label>
-      <label>Equipment Used<input id="crewReportEquipment" placeholder="Truck, auger, lift..."></label>
-      <label>Delays / Downtime<input id="crewReportDelays" placeholder="Weather, inspection, material..."></label>
-      <label class="wide">Progress Notes<textarea id="crewReportNotes" rows="4" placeholder="Work completed, issues, and next steps"></textarea></label>
-    </div>
-    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Submit Report</button></div>
-  </form>
+<dialog id="conflictDialog">
+  <div class="dialog-head"><div><p class="eyebrow">DOUBLE-BOOKING ALERT</p><h2>Crew Already Assigned</h2></div></div>
+  <div id="conflictDetails"></div>
+  <p>The crew already has work on one or more selected dates. Continue only if this is intentionally an additional assignment.</p>
+  <div class="dialog-actions"><button id="conflictBack" class="secondary" type="button">Go Back</button><button id="conflictContinue" type="button">Add Additional Assignment</button></div>
 </dialog>
 
-<dialog id="crewPhotoDialog" class="atlas-dialog">
-  <form id="crewPhotoForm">
-    <div class="dialog-head"><div><h3>Add Project Photo</h3><p>Photos remain available offline in this demo build.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
-    <div class="dialog-grid">
-      <label>Project<select id="crewPhotoProject" data-crew-project-select required></select></label>
-      <label>Category<select id="crewPhotoCategory"><option>Progress</option><option>Issue</option><option>Safety</option><option>Completion</option><option>Delivery</option></select></label>
-      <label class="wide">Photo<input id="crewPhotoFile" type="file" accept="image/*" capture="environment" required></label>
-      <label class="wide">Caption<textarea id="crewPhotoCaption" rows="3" placeholder="Describe what the photo shows"></textarea></label>
-    </div>
-    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Save Photo</button></div>
-  </form>
-</dialog>
-
-<dialog id="crewMaterialDialog" class="atlas-dialog">
-  <form id="crewMaterialForm">
-    <div class="dialog-head"><div><h3>Send Material Request</h3><p>Route field needs into the existing purchasing queue.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
-    <div class="dialog-grid">
-      <label>Project<select id="crewMaterialProject" data-crew-project-select required></select></label>
-      <label>Urgency<select id="crewMaterialUrgency"><option>Normal</option><option>Urgent</option></select></label>
-      <label class="wide">Materials and Quantities<textarea id="crewMaterialItems" rows="4" required placeholder="Example: 12 posts, 24 bags concrete, 150 LF rail"></textarea></label>
-      <label class="wide">Notes<textarea id="crewMaterialNotes" rows="3" placeholder="Needed date, delivery location, substitutions..."></textarea></label>
-    </div>
-    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Submit Request</button></div>
-  </form>
-</dialog>
-
-<dialog id="crewSafetyDialog" class="atlas-dialog">
-  <form id="crewSafetyForm">
-    <div class="dialog-head"><div><h3>Daily Safety Checklist</h3><p>Complete before field work begins.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
-    <div class="dialog-grid">
-      <label>Project<select id="crewSafetyProject" data-crew-project-select required></select></label>
-      <label class="check"><input id="crewSafetyPPE" type="checkbox"> Required PPE confirmed</label>
-      <label class="check"><input id="crewSafetyBriefing" type="checkbox"> Crew briefing completed</label>
-      <label class="check"><input id="crewSafetyArea" type="checkbox"> Work area inspected</label>
-      <label class="check"><input id="crewSafetyTools" type="checkbox"> Tools and equipment inspected</label>
-      <label class="check"><input id="crewSafetyIncident" type="checkbox"> Issue or incident requires review</label>
-      <label class="wide">Notes<textarea id="crewSafetyNotes" rows="3" placeholder="Hazards, corrective actions, or observations"></textarea></label>
-    </div>
-    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Submit Checklist</button></div>
-  </form>
-</dialog>
-
-<dialog id="crewEquipmentDialog" class="atlas-dialog">
-  <form id="crewEquipmentForm">
-    <div class="dialog-head"><div><h3>Check Out Equipment</h3><p>Assign equipment to a project and crew member.</p></div><button type="button" class="dialog-close" data-close-crew-dialog>×</button></div>
-    <div class="dialog-grid">
-      <label>Project<select id="crewEquipmentProject" data-crew-project-select required></select></label>
-      <label>Equipment<input id="crewEquipmentName" required placeholder="Truck, trailer, auger, lift..."></label>
-      <label>Assigned To<input id="crewEquipmentAssignedTo" placeholder="Crew lead or member"></label>
-      <label>Condition<select id="crewEquipmentCondition"><option>Good</option><option>Needs Attention</option><option>Damaged</option></select></label>
-    </div>
-    <div class="dialog-actions"><button type="button" class="secondary" data-close-crew-dialog>Cancel</button><button type="submit">Check Out</button></div>
-  </form>
-</dialog>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/modules/supabase-client.js"></script>
-<script src="js/modules/permissions.js"></script>
-<script src="js/modules/auth.js"></script>
-<script src="js/modules/travels.js"></script>
-<script src="js/modules/mission-control.js"></script>
-<script src="js/modules/crew-operations.js"></script>
-<script src="js/modules/user-management.js"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
