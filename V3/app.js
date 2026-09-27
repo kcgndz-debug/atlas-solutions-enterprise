@@ -90,7 +90,7 @@ function switchView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));
   document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
   const labels=isMarine?{
-    dashboard:["MARINE OPERATIONS","Command Center"],mission:["PRODUCTION CONTROL","Production Control"],projects:["HULL REGISTRY","Hull Registry"],executive:["EXECUTIVE COMMAND","Executive Overview"],estimates:["BUILD PLANNING","Build Planning"],schedule:["PRODUCTION INTELLIGENCE","Production Schedule"],crews:["WORK CENTERS","Production Teams"],field:["WORK PACKAGES","Work Packages"],materials:["SUPPLY CHAIN","Materials & Purchasing"],finance:["BUILD COST","Build Cost"],engineering:["ENGINEERING CONTROL","Engineering & Drawings"],quality:["QUALITY ASSURANCE","Quality"],delivery:["COMMISSIONING","Sea Trial & Delivery"],warranty:["CLOSED-LOOP QUALITY","Warranty & Service"],models:["MANUFACTURING TEMPLATES","Model Library"],users:["ACCESS & ACCOUNTABILITY","User Management"],athena:["ATLAS INTELLIGENCE","Athena"],settings:["SYSTEM","Settings"]
+    dashboard:["MARINE OPERATIONS","Command Center"],mission:["PRODUCTION CONTROL","Production Control"],projects:["HULL REGISTRY","Hull Registry"],executive:["EXECUTIVE COMMAND","Executive Overview"],estimates:["BUILD PLANNING","Build Planning"],orders:["ORDER-TO-HULL","Orders & Configuration"],planning:["MATERIAL + CAPACITY INTELLIGENCE","MRP & What-If"],schedule:["PRODUCTION INTELLIGENCE","Production Schedule"],crews:["WORK CENTERS","Production Teams"],field:["WORK PACKAGES","Work Packages"],materials:["SUPPLY CHAIN","Supply Chain & POs"],inventory:["WAREHOUSE CONTROL","Inventory & Warehouse"],suppliers:["SUPPLIER COLLABORATION","Suppliers"],digitalthread:["ATLAS DIGITAL THREAD","Hull Digital Thread"],finance:["ERP FINANCIALS","Financials & Build Cost"],engineering:["ENGINEERING CONTROL","Engineering & Drawings"],quality:["QUALITY ASSURANCE","Quality"],delivery:["COMMISSIONING","Sea Trial & Delivery"],warranty:["CLOSED-LOOP QUALITY","Warranty & Service"],models:["MANUFACTURING TEMPLATES","Model Library"],users:["ACCESS & ACCOUNTABILITY","User Management"],athena:["ATLAS INTELLIGENCE","Athena"],settings:["SYSTEM","Settings"]
   }:{dashboard:["OPERATIONS","Dashboard"],mission:["COMPANY OPERATIONS","Mission Control"],projects:["PROJECT PORTFOLIO","Projects"],executive:["OWNER / EXECUTIVE COMMAND","Executive Overview"],estimates:["BID DEVELOPMENT","Estimating"],schedule:["OPERATIONS INTELLIGENCE","Operations Scheduler"],crews:["FIELD OPERATIONS","Crew Operations"],field:["CREW FIELD OPERATIONS","Field Operations"],materials:["PROCUREMENT","Material Requests"],finance:["COMPANY FINANCE","Finance"],users:["ACCESS & ACCOUNTABILITY","User Management"],athena:["ATLAS INTELLIGENCE","Athena"],settings:["SYSTEM","Settings"]};
   $("pageEyebrow").textContent=labels[id]?.[0]||"ATLAS";
   $("pageTitle").textContent=labels[id]?.[1]||"Atlas";
@@ -283,10 +283,12 @@ function applyPermissions(){
   if(isMarine){
     allowed.delete("estimates");
     const role=roleCode();
-    if(["owner","company_admin","project_manager"].includes(role)) ["engineering","quality","delivery","warranty","models"].forEach(v=>allowed.add(v));
-    if(["purchasing"].includes(role)) ["engineering","models"].forEach(v=>allowed.add(v));
-    if(["crew_leader","crew_member"].includes(role)) ["quality","delivery"].forEach(v=>allowed.add(v));
-    if(role==="read_only") ["engineering","quality","delivery","warranty","models"].forEach(v=>allowed.add(v));
+    const erpViews=["orders","planning","inventory","suppliers","digitalthread"];
+    if(["owner","company_admin","project_manager"].includes(role)) [...erpViews,"engineering","quality","delivery","warranty","models"].forEach(v=>allowed.add(v));
+    if(role==="purchasing") ["planning","inventory","suppliers","digitalthread","engineering","models"].forEach(v=>allowed.add(v));
+    if(role==="finance") ["orders","planning","suppliers","digitalthread"].forEach(v=>allowed.add(v));
+    if(["crew_leader","crew_member"].includes(role)) ["inventory","digitalthread","quality","delivery"].forEach(v=>allowed.add(v));
+    if(role==="read_only") [...erpViews,"engineering","quality","delivery","warranty","models"].forEach(v=>allowed.add(v));
   }
   document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("hidden",!allowed.has(b.dataset.view)));
 }
