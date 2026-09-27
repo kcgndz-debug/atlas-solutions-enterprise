@@ -620,6 +620,10 @@ function inviteUserDialog(){
 }
 function projectDialog(){
   const pms=state.users.filter(u=>u.companyId===currentCompanyId&&u.role==="project_manager");
+  if(isMarine){
+    openDialog({mode:"project",title:"Add Hull",eyebrow:"HULL REGISTRY",html:`<label>Hull ID<input name="name" placeholder="B39-028" required></label><label>Model<select name="model"><option>28CC</option><option>34CC</option><option>39CC</option><option>35 Flybridge</option><option>50 Sport</option><option>61 Convertible</option></select></label><label class="wide">Dealer / Customer<input name="customer" placeholder="Dealer or customer"></label><label>Production Location<input name="location" value="Tampa"></label><label class="wide">Configuration Summary<input name="scope" placeholder="Engine package, finish, major options"></label><label>Production Manager<select name="pmId">${pms.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label>Current Stage<select name="status"><option>Engineering Release</option><option>Lamination</option><option>Assembly</option><option>Mechanical</option><option>Electrical</option><option>Interior</option><option>Final Finish</option><option>Final QA</option></select></label><label>Target Delivery<input name="targetDelivery" type="date"></label><label>Build Budget<input name="contractValue" type="number" min="0"></label>`});
+    return;
+  }
   openDialog({mode:"project",title:"Add Project",eyebrow:"PROJECTS",html:`<label class="wide">Project Name<input name="name" required></label><label>Location<input name="location" required></label><label>Customer<input name="customer" required></label><label>Scope<input name="scope" required></label><label>Project Manager<select name="pmId">${pms.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label>Status<select name="status"><option>Active</option><option>Bid</option><option>Shop Drawings</option><option>Materials</option><option>Scheduled</option><option>At Risk</option></select></label><label>Contract Value<input name="contractValue" type="number" min="0"></label>`});
 }
 
@@ -629,14 +633,24 @@ function estimateDialog(){
 }
 function fieldReportDialog(){
   const crews=companyRows("crews"),projects=companyRows("projects").filter(p=>p.status!=="Bid");
+  if(isMarine){
+    openDialog({mode:"fieldReport",title:"Update Work Package",eyebrow:"WORK PACKAGES",html:`<label>Date<input name="date" type="date" value="${iso(new Date())}" required></label><label>Production Team<select name="crewId">${crews.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label class="wide">Hull<select name="projectId">${projects.map(p=>`<option value="${p.id}">${esc(p.name)} · ${esc(p.model||"")}</option>`).join("")}</select></label><label class="wide">Work Package / Progress<textarea name="production" required placeholder="WP number, operation, and percent complete"></textarea></label><label>Labor Hours<input name="hours" type="number" step="0.5" min="0"></label><label>Photos<input name="photos" type="number" min="0" value="0"></label><label class="wide">Work Center Notes<input name="weather" value="Indoor production"></label><label class="wide">Safety / Quality Notes<textarea name="safety"></textarea></label><label>Tools<select name="equipmentReady"><option value="true">Ready</option><option value="false">Issue</option></select></label><label>Materials<select name="suppliesReady"><option value="true">Ready</option><option value="false">Blocked</option></select></label><label class="wide">Blockers<textarea name="issues">None</textarea></label>`});
+    return;
+  }
   openDialog({mode:"fieldReport",title:"Daily Field Report",eyebrow:"FIELD OPERATIONS",html:`<label>Date<input name="date" type="date" value="${iso(new Date())}" required></label><label>Crew<select name="crewId">${crews.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label class="wide">Project<select name="projectId">${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label class="wide">Production Completed<textarea name="production" required></textarea></label><label>Hours<input name="hours" type="number" step="0.5" min="0"></label><label>Photos<input name="photos" type="number" min="0" value="0"></label><label class="wide">Weather<input name="weather"></label><label class="wide">Safety Notes<textarea name="safety"></textarea></label><label>Equipment<select name="equipmentReady"><option value="true">Ready</option><option value="false">Issue</option></select></label><label>Supplies<select name="suppliesReady"><option value="true">Ready</option><option value="false">Issue</option></select></label><label class="wide">Issues<textarea name="issues">None</textarea></label>`});
 }
 function scheduleDialog(){
   const projects=companyRows("projects").filter(p=>p.status!=="Bid"),crews=companyRows("crews");
   openDialog({mode:"schedule",title:"Schedule Work",eyebrow:"OPERATIONS SCHEDULER",html:`<label class="wide">Project<select name="projectId">${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label>Crew<select name="crewId">${crews.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label>Start Date<input name="startDate" type="date" value="${iso(new Date())}" required></label><label>End Date<input name="endDate" type="date" value="${iso(new Date())}" required></label><label>Start Time<input name="start" type="time" value="07:00"></label><label>End Time<input name="end" type="time" value="15:30"></label><label>Slot Color<select name="color"><option value="">No color</option><option value="red">Red</option><option value="blue">Blue</option><option value="green">Green</option></select></label><div class="wide"><strong>Days</strong><div class="button-row">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((x,i)=>`<label><input type="checkbox" name="weekday" value="${i}" ${i<5?"checked":""}> ${x}</label>`).join("")}</div></div>`});
 }
-function crewDialog(){openDialog({mode:"crew",title:"Create Crew",eyebrow:"CREW OPERATIONS",html:`<label>Crew Name<input name="name" required></label><label>Lead<input name="lead" required></label><label>Vehicle<input name="vehicle"></label><label class="wide">Members (comma-separated)<textarea name="members"></textarea></label><label class="wide">Equipment (comma-separated)<textarea name="equipment"></textarea></label>`});}
-function materialDialog(){openDialog({mode:"material",title:"Material Request",eyebrow:"PROCUREMENT",html:`<label class="wide">Project<select name="project">${companyRows("projects").map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></label><label class="wide">Items<textarea name="items" required></textarea></label><label>Urgency<select name="urgency"><option>Normal</option><option>High</option><option>Critical</option></select></label><label>Status<select name="status"><option>Open</option><option>Approved</option><option>Ordered</option><option>Delivered</option></select></label>`});}
+function crewDialog(){
+  if(isMarine){openDialog({mode:"crew",title:"Create Production Team",eyebrow:"WORK CENTERS",html:`<label>Team / Work Center<input name="name" required></label><label>Lead<input name="lead" required></label><label>Station / Bay<input name="vehicle"></label><label class="wide">Team Members (comma-separated)<textarea name="members"></textarea></label><label class="wide">Tools / Equipment (comma-separated)<textarea name="equipment"></textarea></label>`});return;}
+  openDialog({mode:"crew",title:"Create Crew",eyebrow:"CREW OPERATIONS",html:`<label>Crew Name<input name="name" required></label><label>Lead<input name="lead" required></label><label>Vehicle<input name="vehicle"></label><label class="wide">Members (comma-separated)<textarea name="members"></textarea></label><label class="wide">Equipment (comma-separated)<textarea name="equipment"></textarea></label>`});
+}
+function materialDialog(){
+  if(isMarine){openDialog({mode:"material",title:"Material / Purchasing Exception",eyebrow:"SUPPLY CHAIN",html:`<label class="wide">Hull<select name="project">${companyRows("projects").map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></label><label>Part Number<input name="partNumber"></label><label>Supplier<input name="supplier"></label><label class="wide">Item / Kit<textarea name="items" required></textarea></label><label>Urgency<select name="urgency"><option>Normal</option><option>High</option><option>Critical</option></select></label><label>Status<select name="status"><option>Awaiting Confirmation</option><option>Ordered</option><option>In Transit</option><option>Staged</option><option>Delivered</option><option>Delayed</option></select></label><label>Required On Line<input name="requiredDate" type="date"></label><label>ETA<input name="eta"></label><label class="wide">Production Impact<textarea name="impact"></textarea></label>`});return;}
+  openDialog({mode:"material",title:"Material Request",eyebrow:"PROCUREMENT",html:`<label class="wide">Project<select name="project">${companyRows("projects").map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></label><label class="wide">Items<textarea name="items" required></textarea></label><label>Urgency<select name="urgency"><option>Normal</option><option>High</option><option>Critical</option></select></label><label>Status<select name="status"><option>Open</option><option>Approved</option><option>Ordered</option><option>Delivered</option></select></label>`});
+}
 
 async function createCloudUser(payload){
   const {data,error}=await supabase.functions.invoke("atlas-admin-users",{body:{action:"invite",company_id:currentCompanyId,...payload,redirect_to:`${location.origin}${location.pathname}?atlas_auth=invite`}});
@@ -682,7 +696,9 @@ async function saveRecord(event){
     }
     if(mode==="project"){
       const pm=state.users.find(u=>u.id===fd.get("pmId"));
-      state.projects.push({id:uid(),companyId:currentCompanyId,name:fd.get("name"),location:fd.get("location"),customer:fd.get("customer"),scope:fd.get("scope"),pmId:pm.id,pmName:pm.name,status:fd.get("status"),progress:0,contractValue:Number(fd.get("contractValue")||0),paidAmount:0,startDate:iso(new Date()),color:""});
+      const record={id:uid(),companyId:currentCompanyId,name:fd.get("name"),location:fd.get("location"),customer:fd.get("customer"),scope:fd.get("scope"),pmId:pm.id,pmName:pm.name,status:fd.get("status"),progress:0,contractValue:Number(fd.get("contractValue")||0),paidAmount:0,startDate:iso(new Date()),color:""};
+      if(isMarine) Object.assign(record,{model:fd.get("model"),targetDelivery:fd.get("targetDelivery"),materialReadiness:0,qaOpen:0,risk:"On Schedule",configRev:"A",stage:fd.get("status")});
+      state.projects.push(record);
       saveState();$("recordDialog").close();renderAll();
     }
     if(mode==="crew"){
@@ -690,7 +706,9 @@ async function saveRecord(event){
       saveState();$("recordDialog").close();renderAll();
     }
     if(mode==="material"){
-      state.materials.push({id:uid(),companyId:currentCompanyId,project:fd.get("project"),items:fd.get("items"),urgency:fd.get("urgency"),status:fd.get("status")});
+      const record={id:uid(),companyId:currentCompanyId,project:fd.get("project"),items:fd.get("items"),urgency:fd.get("urgency"),status:fd.get("status")};
+      if(isMarine) Object.assign(record,{partNumber:fd.get("partNumber"),supplier:fd.get("supplier"),requiredDate:fd.get("requiredDate"),eta:fd.get("eta"),impact:fd.get("impact")});
+      state.materials.push(record);
       saveState();$("recordDialog").close();renderAll();
     }
     if(mode==="schedule"){
