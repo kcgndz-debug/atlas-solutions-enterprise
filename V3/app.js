@@ -5,6 +5,7 @@ const $ = id => document.getElementById(id);
 const cfg = window.ATLAS_CONFIG || {};
 const vertical = window.AtlasVertical?.current?.() || { key:"construction", demoCompanyId:"delamere", storageKey:"atlas_v4_demo_state" };
 const isMarine = vertical.key === "marine";
+if(isMarine) window.AtlasMarine?.applyUi?.(vertical);
 const cloudConfigured = Boolean(window.supabase && cfg.supabaseUrl && cfg.supabaseAnonKey);
 const supabase = cloudConfigured ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
@@ -464,6 +465,7 @@ const athenaTourSteps=[
 ];
 let athenaTourIndex=0;
 function renderAthena(){
+  if(isMarine && window.AtlasMarine?.renderAthena) return window.AtlasMarine.renderAthena(marineContext());
   if(!$("athenaGreeting"))return;
   const projects=companyRows("projects"),materials=companyRows("materials"),reports=companyRows("fieldReports");
   const risks=projects.filter(p=>["At Risk","Shop Drawings"].includes(p.status)),conflicts=findConflicts(),critical=materials.filter(m=>m.urgency==="Critical"&&m.status!=="Delivered"),today=iso(new Date()),todayReports=reports.filter(r=>r.date===today);
@@ -794,7 +796,7 @@ window.addEventListener("error",event=>{
 if("serviceWorker" in navigator)navigator.serviceWorker.register("service-worker.js").catch(console.warn);
 
 (async()=>{
-  $("environmentBadge").textContent=cfg.environment==="production"?"PRODUCTION":"LOCAL / DEMO READY";
+  $("environmentBadge").textContent=isMarine?(vertical.environmentLabel||"BERTRAM DEMONSTRATION ENVIRONMENT"):(cfg.environment==="production"?"PRODUCTION":"LOCAL / DEMO READY");
   if(cfg.environment==="production"&&!cfg.showDemoLogin)$("demoLogin").classList.add("hidden");
   if(!supabase)return;
   const {data:{user}}=await supabase.auth.getUser();
