@@ -25,7 +25,7 @@
       environmentLabel: "BERTRAM DEMONSTRATION ENVIRONMENT",
       demoCompanyId: "bertram-demo",
       demoCompanyName: "Bertram Demonstration Environment",
-      storageKey: "atlas_marine_bertram_demo_state",
+      storageKey: "atlas_marine_bertram_demo_state_v2",
       terminology: {
         project: "Hull",
         projects: "Hull Registry",
