@@ -105,6 +105,26 @@
         {id:"sim-1",companyId,name:"Generator remains 6 days late",hull:"B50-008",result:"Sea trial moves +4 days unless electrical commissioning is resequenced.",recommendation:"Move non-generator commissioning ahead; authorize premium freight; protect QA slot.",deliveryDelta:4,costDelta:2800},
         {id:"sim-2",companyId,name:"Alternate generator sourced in 48 hours",hull:"B50-008",result:"Current sea-trial target can be preserved.",recommendation:"Approve alternate supplier after engineering equivalency check.",deliveryDelta:0,costDelta:6900},
         {id:"sim-3",companyId,name:"Add weekend mechanical shift",hull:"B50-008",result:"Recovers 2 production days after delayed receipt.",recommendation:"Use only if alternate sourcing is rejected.",deliveryDelta:2,costDelta:4200}
+      ],
+
+      capacityPlan: [
+        {id:"cap-1",companyId,center:"Lamination",available:160,demand:142,utilization:89,status:"Healthy",constraint:"None"},
+        {id:"cap-2",companyId,center:"Mechanical",available:160,demand:184,utilization:115,status:"Overloaded",constraint:"Generator + propulsion work overlap"},
+        {id:"cap-3",companyId,center:"Electrical",available:120,demand:132,utilization:110,status:"At Risk",constraint:"B39-026 and B61-004 commissioning overlap"},
+        {id:"cap-4",companyId,center:"Finish",available:160,demand:146,utilization:91,status:"Healthy",constraint:"None"},
+        {id:"cap-5",companyId,center:"Quality / Commissioning",available:80,demand:74,utilization:93,status:"Tight",constraint:"Sea-trial gate sequence"}
+      ],
+
+      qualityPlans: [
+        {id:"qp-1",companyId,model:"39CC",area:"Electrical Final",plan:"QP-39-ELEC-04",checkpoints:24,fmea:"FMEA-EL-39 Rev C",controlPlan:"CP-EL-39 Rev D",fpy:94,audit:"Current"},
+        {id:"qp-2",companyId,model:"50 Sport",area:"Mechanical Commissioning",plan:"QP-50-MECH-07",checkpoints:31,fmea:"FMEA-ME-50 Rev B",controlPlan:"CP-ME-50 Rev C",fpy:91,audit:"Current"},
+        {id:"qp-3",companyId,model:"61 Convertible",area:"Systems Commissioning",plan:"QP-61-SYS-09",checkpoints:42,fmea:"FMEA-SYS-61 Rev D",controlPlan:"CP-SYS-61 Rev D",fpy:89,audit:"Review Due"}
+      ],
+
+      correctiveActions: [
+        {id:"capa-1",companyId,number:"CAR-026-14",hull:"B39-026",source:"Electrical Final",issue:"Bilge pump connection correction",owner:"Electrical Team 2",due:plus(2),status:"Open"},
+        {id:"capa-2",companyId,number:"CAR-063-08",hull:"B28-063",source:"Commissioning",issue:"Port trim indication re-test",owner:"QA / Electrical",due:plus(1),status:"Reinspection"},
+        {id:"capa-3",companyId,number:"SCAR-26-011",hull:"Supplier",source:"Warranty Trend",issue:"Trim Pump Assembly recurrence",owner:"Supplier Quality",due:plus(12),status:"Supplier Response"}
       ]
     };
   };
@@ -290,6 +310,23 @@
     const { $, esc, money } = ctx;
     const companyId=ctx.currentCompanyId;
 
+    const qualitySection=$("quality");
+    if(qualitySection){
+      let qualityExt=document.getElementById("marineQualityPlanningExt");
+      if(!qualityExt){qualityExt=document.createElement("div");qualityExt.id="marineQualityPlanningExt";qualitySection.appendChild(qualityExt);}
+      const plans=(ctx.state.qualityPlans||[]).filter(q=>q.companyId===companyId);
+      const capas=(ctx.state.correctiveActions||[]).filter(q=>q.companyId===companyId);
+      qualityExt.innerHTML=`
+        <div class="section-head"><div><p class="eyebrow">QUALITY PLANNING</p><h2>Inspection Plans, FMEA & Corrective Action</h2><p>Quality is planned with the model and work package, not added at the end of production.</p></div></div>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>Model</th><th>Area</th><th>Inspection Plan</th><th>Checkpoints</th><th>FMEA</th><th>Control Plan</th><th>First Pass Yield</th><th>Audit</th></tr></thead><tbody>
+          ${plans.map(q=>`<tr><td><strong>${esc(q.model)}</strong></td><td>${esc(q.area)}</td><td>${esc(q.plan)}</td><td>${q.checkpoints}</td><td>${esc(q.fmea)}</td><td>${esc(q.controlPlan)}</td><td>${q.fpy}%</td><td><span class="badge">${esc(q.audit)}</span></td></tr>`).join("")}
+        </tbody></table></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">CLOSED-LOOP CAPA</p><h3>Corrective & Supplier Actions</h3></div></div>
+          ${capas.map(c=>`<div class="list-row"><div><strong>${esc(c.number)} · ${esc(c.hull)}</strong><small>${esc(c.source)} · ${esc(c.issue)} · Owner: ${esc(c.owner)}</small></div><div><span class="badge">${esc(c.status)}</span><small>Due ${esc(c.due)}</small></div></div>`).join("")}
+        </article>
+      `;
+    }
+
     const orders=$("orders");
     const sales=(ctx.state.salesOrders||[]).filter(x=>x.companyId===companyId);
     if(orders) orders.innerHTML=`
@@ -331,6 +368,9 @@
         <div class="table-wrap"><table><thead><tr><th>Item</th><th>Description</th><th>Hull</th><th>Type</th><th>Qty</th><th>Need</th><th>Status</th><th>Exception</th><th>Recommended Action</th></tr></thead><tbody>
         ${mrp.map(m=>`<tr><td><strong>${esc(m.item)}</strong></td><td>${esc(m.description)}</td><td>${esc(m.hull)}</td><td>${esc(m.type)}</td><td>${m.qty}</td><td>${esc(m.need)}</td><td><span class="badge">${esc(m.status)}</span></td><td>${esc(m.message)}</td><td>${esc(m.action)}</td></tr>`).join("")}
         </tbody></table></div>
+      </article>
+      <article class="panel"><div class="panel-head"><div><p class="eyebrow">FINITE CAPACITY</p><h3>Work-Center Load & Constraints</h3></div><span class="badge">14-day horizon</span></div>
+        <div class="capacity-board">${(ctx.state.capacityPlan||[]).filter(c=>c.companyId===companyId).map(c=>`<div class="capacity-row"><div><strong>${esc(c.center)}</strong><small>${c.demand} demand hrs / ${c.available} available hrs · ${esc(c.constraint)}</small></div><div><span class="badge">${esc(c.status)}</span><b>${c.utilization}%</b></div><div class="progress"><span style="width:${Math.min(100,c.utilization)}%"></span></div></div>`).join("")}</div>
       </article>
       <article class="panel"><div class="panel-head"><div><p class="eyebrow">WHAT-IF DELIVERY ENGINE</p><h3>B50-008 Recovery Scenarios</h3></div></div>
         <div class="scenario-grid">${scenarios.map(s=>`<button type="button" class="scenario-card" data-scenario="${esc(s.id)}"><strong>${esc(s.name)}</strong><small>${esc(s.result)}</small><span>Delivery: +${s.deliveryDelta} days · Cost: +${money(s.costDelta)}</span></button>`).join("")}</div>
