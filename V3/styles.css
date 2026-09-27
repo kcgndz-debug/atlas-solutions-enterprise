@@ -249,3 +249,11 @@ html[data-atlas-vertical="marine"] #mainNav{
     grid-template-columns:58px 1fr;
   }
 }
+
+html[data-atlas-vertical="marine"] .capacity-board{display:grid;gap:12px}
+html[data-atlas-vertical="marine"] .capacity-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:12px 0;border-bottom:1px solid #e8edf1}
+html[data-atlas-vertical="marine"] .capacity-row:last-child{border-bottom:0}
+html[data-atlas-vertical="marine"] .capacity-row>div:first-child{display:grid;gap:3px}
+html[data-atlas-vertical="marine"] .capacity-row>div:nth-child(2){display:flex;align-items:center;gap:8px}
+html[data-atlas-vertical="marine"] .capacity-row .progress{grid-column:1/-1}
+html[data-atlas-vertical="marine"] #marineQualityPlanningExt table{min-width:1100px}
