@@ -145,6 +145,8 @@
 
       const badge = document.getElementById("environmentBadge");
       if (badge) badge.textContent = vertical.environmentLabel || "MARINE DEMO";
+      const demoButton = document.getElementById("demoLogin");
+      if (demoButton) demoButton.textContent = "Open Bertram Demo";
 
       document.querySelectorAll(".nav[data-view]").forEach(button => {
         const label = vertical.navigation?.[button.dataset.view];
@@ -342,6 +344,22 @@
       $("financePmSummary").innerHTML=managers.map(pm=>{const hh=hulls.filter(h=>h.pmName===pm),b=hh.reduce((s,h)=>s+h.contractValue,0),a=hh.reduce((s,h)=>s+h.paidAmount,0);return `<article class="finance-pm-card"><strong>${esc(pm)}</strong><small>${hh.length} active hulls</small><div><span>Budget</span><b>${money(b)}</b></div><div><span>Actual</span><b>${money(a)}</b></div><div><span>Remaining</span><b>${money(Math.max(0,b-a))}</b></div></article>`}).join("");
       const filtered=$("financePmFilter").value?hulls.filter(h=>h.pmName===$("financePmFilter").value):hulls;
       $("financeRows").innerHTML=filtered.map(h=>`<tr><td>${esc(h.pmName)}</td><td>${esc(h.name)} · ${esc(h.model)}</td><td>${money(h.contractValue)}</td><td>${money(h.paidAmount)}</td><td>${money(Math.max(0,h.contractValue-h.paidAmount))}</td><td>${h.progress}%</td><td>${h.materialReadiness}%</td><td>${h.qaOpen}</td><td>${esc(h.risk)}</td></tr>`).join("");
+    },
+
+    renderAthena(ctx) {
+      const {$, companyRows, firstName, timeGreeting, esc} = ctx;
+      const hulls=companyRows("projects");
+      const risk=hulls.filter(h=>h.risk!=="On Schedule");
+      const critical=companyRows("materials").filter(m=>m.urgency==="Critical"&&m.status!=="Delivered");
+      const holds=(ctx.state.inspections||[]).filter(i=>i.companyId===ctx.currentCompanyId&&i.status==="Hold");
+      $("athenaGreeting").textContent=`${timeGreeting()}, ${firstName()}`;
+      $("athenaBriefText").textContent=`Atlas Marine is tracking ${hulls.length} demo hulls. ${risk.length} need attention, ${critical.length} critical supply item${critical.length===1?"":"s"} are open, and ${holds.length} QA hold${holds.length===1?"":"s"} are blocking progression.`;
+      $("athenaRecommendations").innerHTML=[
+        {title:"Review B50-008",detail:"Generator ETA is later than the required-on-line date and affects downstream commissioning."},
+        {title:"Acknowledge EL-39-212 Rev E",detail:"B39-026 electrical work is tied to the latest drawing revision."},
+        {title:"Clear QA holds",detail:holds.length?holds.map(h=>h.hull+" — "+h.finding).join("; "):"No QA holds currently block delivery."},
+        {title:"Review warranty pattern",detail:"Three demo 39CC warranty cases share the Trim Pump Assembly component."}
+      ].map(x=>`<div class="list-row"><div><strong>${esc(x.title)}</strong><small>${esc(x.detail)}</small></div></div>`).join("");
     },
 
     renderExtraViews(ctx) {
