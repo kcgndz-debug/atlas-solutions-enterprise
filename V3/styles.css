@@ -75,3 +75,68 @@ dialog{width:min(720px,calc(100vw - 30px));border:0;border-radius:18px;padding:2
 .athena-tour-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:24px;background:rgba(15,23,42,.35);pointer-events:none}.athena-tour-card{width:min(680px,100%);padding:18px;border-radius:18px;background:#fff;box-shadow:0 30px 80px rgba(15,23,42,.35);pointer-events:auto}.athena-tour-head{display:flex;align-items:center;gap:11px}.athena-tour-head h3{margin:3px 0}.athena-tour-progress{height:7px;margin-top:14px;border-radius:999px;background:#e2e8f0;overflow:hidden}.athena-tour-progress span{display:block;height:100%;background:linear-gradient(90deg,#2c96cd,#173451)}
 @media(max-width:900px){.estimate-builder{grid-template-columns:1fr}.estimate-breakdown{grid-template-columns:1fr 1fr}.athena-guide-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.estimate-result-hero,.estimate-breakdown{grid-template-columns:1fr}.athena-chat-form{flex-direction:column}}
+
+
+/* Atlas Marine vertical */
+html[data-atlas-vertical="marine"] .environment-badge{
+  letter-spacing:.08em;
+}
+html[data-atlas-vertical="marine"] .marine-hull-card{
+  min-height:245px;
+}
+html[data-atlas-vertical="marine"] .marine-stat-row{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:14px 0;
+}
+html[data-atlas-vertical="marine"] .marine-stat-row span{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:8px 10px;
+  border:1px solid var(--line,#d9e1e8);
+  border-radius:10px;
+  background:rgba(255,255,255,.5);
+  font-size:.75rem;
+}
+html[data-atlas-vertical="marine"] .marine-stat-row b{
+  font-size:.9rem;
+}
+html[data-atlas-vertical="marine"] .marine-material-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:18px;
+  align-items:start;
+  padding:16px 0;
+  border-bottom:1px solid var(--line,#d9e1e8);
+}
+html[data-atlas-vertical="marine"] .marine-material-row:last-child{
+  border-bottom:0;
+}
+html[data-atlas-vertical="marine"] .marine-material-row > div{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+html[data-atlas-vertical="marine"] .pattern-alert{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:18px;
+  border-radius:14px;
+  border:1px solid #d8a62a;
+  background:rgba(216,166,42,.08);
+}
+html[data-atlas-vertical="marine"] #engineering table,
+html[data-atlas-vertical="marine"] #quality table,
+html[data-atlas-vertical="marine"] #warranty table{
+  min-width:980px;
+}
+html[data-atlas-vertical="marine"] #dashboard .panel.hidden{
+  display:none;
+}
+@media (max-width:800px){
+  html[data-atlas-vertical="marine"] .marine-stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  html[data-atlas-vertical="marine"] .marine-material-row{grid-template-columns:1fr}
+}
