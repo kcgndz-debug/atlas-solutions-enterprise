@@ -3,6 +3,9 @@
 
 const $ = id => document.getElementById(id);
 const cfg = window.ATLAS_CONFIG || {};
+const vertical = window.AtlasVertical?.current?.() || { key:"construction", demoCompanyId:"delamere", storageKey:"atlas_v4_demo_state" };
+const isMarine = vertical.key === "marine";
+if(isMarine) window.AtlasMarine?.applyUi?.(vertical);
 const cloudConfigured = Boolean(window.supabase && cfg.supabaseUrl && cfg.supabaseAnonKey);
 const supabase = cloudConfigured ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
@@ -22,7 +25,7 @@ const roleDefinitions = {
 
 let account = null;
 let state = null;
-let currentCompanyId = "delamere";
+let currentCompanyId = vertical.demoCompanyId || "delamere";
 let schedulerAnchor = startOfWeek(new Date());
 let pendingSchedulePayload = null;
 let deferredPrompt = null;
@@ -68,7 +71,7 @@ function roleCode(){
 function currentCompany(){return state.companies.find(c=>c.id===currentCompanyId)||state.companies[0];}
 function companyRows(key){return (state[key]||[]).filter(row=>row.companyId===currentCompanyId);}
 function saveState(){
-  localStorage.setItem("atlas_v4_demo_state",JSON.stringify(state));
+  localStorage.setItem(vertical.storageKey || "atlas_v4_demo_state",JSON.stringify(state));
   $("syncText").textContent="Saved locally";
   setTimeout(()=>$("syncText").textContent="Ready",700);
 }
@@ -86,13 +89,16 @@ function hideStatus(){$("userAdminStatus").classList.add("hidden");}
 function switchView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));
   document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
-  const labels={dashboard:["OPERATIONS","Dashboard"],mission:["COMPANY OPERATIONS","Mission Control"],projects:["PROJECT PORTFOLIO","Projects"],executive:["OWNER / EXECUTIVE COMMAND","Executive Overview"],estimates:["BID DEVELOPMENT","Estimating"],schedule:["OPERATIONS INTELLIGENCE","Operations Scheduler"],crews:["FIELD OPERATIONS","Crew Operations"],field:["CREW FIELD OPERATIONS","Field Operations"],materials:["PROCUREMENT","Material Requests"],finance:["COMPANY FINANCE","Finance"],users:["ACCESS & ACCOUNTABILITY","User Management"],athena:["ATLAS INTELLIGENCE","Athena"],settings:["SYSTEM","Settings"]};
+  const labels=isMarine?{
+    dashboard:["MARINE OPERATIONS","Command Center"],mission:["PRODUCTION CONTROL","Production Control"],projects:["HULL REGISTRY","Hull Registry"],executive:["EXECUTIVE COMMAND","Executive Overview"],estimates:["BUILD PLANNING","Build Planning"],orders:["ORDER-TO-HULL","Orders & Configuration"],planning:["MATERIAL + CAPACITY INTELLIGENCE","MRP & What-If"],schedule:["PRODUCTION INTELLIGENCE","Production Schedule"],crews:["WORK CENTERS","Production Teams"],field:["WORK PACKAGES","Work Packages"],materials:["SUPPLY CHAIN","Supply Chain & POs"],inventory:["WAREHOUSE CONTROL","Inventory & Warehouse"],suppliers:["SUPPLIER COLLABORATION","Suppliers"],digitalthread:["ATLAS DIGITAL THREAD","Hull Digital Thread"],finance:["ERP FINANCIALS","Financials & Build Cost"],engineering:["ENGINEERING CONTROL","Engineering & Drawings"],quality:["QUALITY ASSURANCE","Quality"],delivery:["COMMISSIONING","Sea Trial & Delivery"],warranty:["CLOSED-LOOP QUALITY","Warranty & Service"],models:["MANUFACTURING TEMPLATES","Model Library"],users:["ACCESS & ACCOUNTABILITY","User Management"],athena:["ATLAS INTELLIGENCE","Athena"],settings:["SYSTEM","Settings"]
+  }:{dashboard:["OPERATIONS","Dashboard"],mission:["COMPANY OPERATIONS","Mission Control"],projects:["PROJECT PORTFOLIO","Projects"],executive:["OWNER / EXECUTIVE COMMAND","Executive Overview"],estimates:["BID DEVELOPMENT","Estimating"],schedule:["OPERATIONS INTELLIGENCE","Operations Scheduler"],crews:["FIELD OPERATIONS","Crew Operations"],field:["CREW FIELD OPERATIONS","Field Operations"],materials:["PROCUREMENT","Material Requests"],finance:["COMPANY FINANCE","Finance"],users:["ACCESS & ACCOUNTABILITY","User Management"],athena:["ATLAS INTELLIGENCE","Athena"],settings:["SYSTEM","Settings"]};
   $("pageEyebrow").textContent=labels[id]?.[0]||"ATLAS";
   $("pageTitle").textContent=labels[id]?.[1]||"Atlas";
   window.scrollTo(0,0);
 }
 
 function demoSeed(){
+  if(isMarine && window.AtlasMarine?.demoSeed) return window.AtlasMarine.demoSeed({iso,startOfWeek});
   const companies=[
     {id:"delamere",name:"Delamere Industries"},
     {id:"day-metal",name:"Day Metal"}
@@ -223,7 +229,7 @@ function demoSeed(){
 }
 
 function loadDemoState(reset=false){
-  const saved=!reset && localStorage.getItem("atlas_v4_demo_state");
+  const saved=!reset && localStorage.getItem(vertical.storageKey || "atlas_v4_demo_state");
   state=saved?JSON.parse(saved):demoSeed();
   saveState();
 }
@@ -252,12 +258,18 @@ async function loadCloudAccount(user){
 
 function openDemo(){
   loadDemoState();
-  account={mode:"demo",user:{id:"owner-demo",email:"owner@atlas.demo"},profile:{first_name:"Kendall",last_name:"G.",display_name:"Kendall G.",is_platform_owner:true},memberships:[{company_id:"delamere",role:{code:"owner",display_name:"Owner / Superuser"}}],membership:{company_id:"delamere",role:{code:"owner",display_name:"Owner / Superuser"}}};
-  currentCompanyId="delamere";
+  if(isMarine){
+    account={mode:"demo",user:{id:"bertram-exec",email:"executive@bertram.demo"},profile:{first_name:"Bertram",last_name:"Executive",display_name:"Bertram Executive",is_platform_owner:true},memberships:[{company_id:vertical.demoCompanyId,role:{code:"owner",display_name:"Executive / Demo"}}],membership:{company_id:vertical.demoCompanyId,role:{code:"owner",display_name:"Executive / Demo"}}};
+    currentCompanyId=vertical.demoCompanyId;
+  }else{
+    account={mode:"demo",user:{id:"owner-demo",email:"owner@atlas.demo"},profile:{first_name:"Kendall",last_name:"G.",display_name:"Kendall G.",is_platform_owner:true},memberships:[{company_id:"delamere",role:{code:"owner",display_name:"Owner / Superuser"}}],membership:{company_id:"delamere",role:{code:"owner",display_name:"Owner / Superuser"}}};
+    currentCompanyId="delamere";
+  }
   enterApp();
 }
 
 function enterApp(){
+  if(isMarine) window.AtlasMarine?.applyUi?.(vertical);
   $("authScreen").classList.add("hidden");$("appShell").classList.remove("hidden");
   const initials=displayName().split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
   $("signedName").textContent=displayName();$("signedEmail").textContent=account.user.email||"";$("signedInitials").textContent=initials;
@@ -268,6 +280,16 @@ function enterApp(){
 
 function applyPermissions(){
   const allowed=new Set(roleDefinitions[roleCode()]?.caps||roleDefinitions.read_only.caps);
+  if(isMarine){
+    allowed.delete("estimates");
+    const role=roleCode();
+    const erpViews=["orders","planning","inventory","suppliers","digitalthread"];
+    if(["owner","company_admin","project_manager"].includes(role)) [...erpViews,"engineering","quality","delivery","warranty","models"].forEach(v=>allowed.add(v));
+    if(role==="purchasing") ["planning","inventory","suppliers","digitalthread","engineering","models"].forEach(v=>allowed.add(v));
+    if(role==="finance") ["orders","planning","suppliers","digitalthread"].forEach(v=>allowed.add(v));
+    if(["crew_leader","crew_member"].includes(role)) ["inventory","digitalthread","quality","delivery"].forEach(v=>allowed.add(v));
+    if(role==="read_only") [...erpViews,"engineering","quality","delivery","warranty","models"].forEach(v=>allowed.add(v));
+  }
   document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("hidden",!allowed.has(b.dataset.view)));
 }
 function renderWorkspace(){
@@ -275,10 +297,13 @@ function renderWorkspace(){
   $("workspaceSelect").value=currentCompanyId;
 }
 
+function marineContext(){return {state,currentCompanyId,companyRows,$,esc,money,iso,firstName,timeGreeting,findConflicts,saveState,switchView,uid};}
 function renderAll(){
   renderDashboard();renderExecutive();renderMission();renderProjects();renderEstimates();renderEstimateCalculator();renderScheduler();renderCrews();renderFieldOperations();renderMaterials();renderFinance();renderUsers();renderRoles();renderAthena();renderSettings();
+  if(isMarine) window.AtlasMarine?.renderExtraViews?.(marineContext());
 }
 function renderDashboard(){
+  if(isMarine && window.AtlasMarine?.renderDashboard) return window.AtlasMarine.renderDashboard(marineContext());
   const projects=companyRows("projects"),crews=companyRows("crews"),materials=companyRows("materials");
   const active=projects.filter(p=>p.status!=="Bid"&&p.status!=="Completed");
   const bids=projects.filter(p=>p.status==="Bid");
@@ -328,6 +353,7 @@ function renderDashboardWeather(){
   $("dashboardWeatherCard").innerHTML=`<div class="weather-main"><div><strong>${esc(project.location)}</strong><small>${esc(project.name)}</small></div><b>${w.temp}°F</b></div><div class="weather-stats"><div><span>Condition</span><strong>${esc(w.condition)}</strong></div><div><span>High / Low</span><strong>${w.high}° / ${w.low}°</strong></div><div><span>Rain</span><strong>${w.precip}%</strong></div><div><span>Wind</span><strong>${esc(w.wind)}</strong></div></div><div class="weather-impact"><strong>Operational impact</strong><small>${esc(w.impact)}</small></div>`;
 }
 function renderExecutive(){
+  if(isMarine && window.AtlasMarine?.renderExecutive) return window.AtlasMarine.renderExecutive(marineContext());
   const projects=companyRows("projects"),active=projects.filter(p=>p.status!=="Bid"&&p.status!=="Completed"),bids=projects.filter(p=>p.status==="Bid"),crews=companyRows("crews"),schedule=companyRows("schedule"),materials=companyRows("materials");
   const contract=active.reduce((s,p)=>s+p.contractValue,0),paid=active.reduce((s,p)=>s+p.paidAmount,0),owed=contract-paid;
   const today=iso(new Date()),deployed=new Set(schedule.filter(x=>x.date===today).map(x=>x.crewId));
@@ -441,6 +467,7 @@ const athenaTourSteps=[
 ];
 let athenaTourIndex=0;
 function renderAthena(){
+  if(isMarine && window.AtlasMarine?.renderAthena) return window.AtlasMarine.renderAthena(marineContext());
   if(!$("athenaGreeting"))return;
   const projects=companyRows("projects"),materials=companyRows("materials"),reports=companyRows("fieldReports");
   const risks=projects.filter(p=>["At Risk","Shop Drawings"].includes(p.status)),conflicts=findConflicts(),critical=materials.filter(m=>m.urgency==="Critical"&&m.status!=="Delivered"),today=iso(new Date()),todayReports=reports.filter(r=>r.date===today);
@@ -465,6 +492,7 @@ function showAthenaTourStep(){
   $("athenaTourBack").disabled=athenaTourIndex===0;$("athenaTourNext").textContent=athenaTourIndex===athenaTourSteps.length-1?"Finish":"Next";
 }
 function athenaAnswer(question){
+  if(isMarine && window.AtlasMarine?.athenaAnswer) return window.AtlasMarine.athenaAnswer(question,marineContext());
   const q=question.toLowerCase();
   if(q.includes("estimate")||q.includes("price")||q.includes("formula"))return "Open Estimating. Select the rail or fence system, enter quantity and base cost, then add production, labor, travel, hoops, mitered ends, equipment, profit, tax, and rounding. Atlas shows every line of the formula before you save.";
   if(q.includes("schedule")||q.includes("crew"))return "Use Operations Scheduler to select a project, crew, date range, weekdays, times, and slot color. Atlas warns when that crew is already assigned on a selected date.";
@@ -487,6 +515,7 @@ function renderEstimates(){
   $("estimateList").innerHTML=filtered.map(e=>`<article class="project-card"><div class="project-meta"><span class="badge">${esc(e.status)}</span><span>${money(e.total)}</span></div><h3>${esc(e.name)}</h3><small>${esc(e.customer)} · ${esc(e.location)}</small><small>${esc(e.scope)}</small><div class="project-meta"><span>${esc(e.pmName)}</span><span>${Number(e.quantity).toLocaleString()} × ${money(e.unitPrice)}</span></div></article>`).join("")||'<div class="empty">No estimates match the filters.</div>';
 }
 function renderFieldOperations(){
+  if(isMarine && window.AtlasMarine?.renderFieldOperations) return window.AtlasMarine.renderFieldOperations(marineContext());
   const reports=companyRows("fieldReports"),today=iso(new Date()),todayReports=reports.filter(r=>r.date===today);
   $("fieldReportsToday").textContent=todayReports.length;$("fieldOpenIssues").textContent=reports.filter(r=>r.issues&&r.issues!=="None").length;$("fieldCrewsReporting").textContent=new Set(todayReports.map(r=>r.crewId)).size;$("fieldPhotos").textContent=reports.reduce((s,r)=>s+(r.photos||0),0);
   $("fieldReportList").innerHTML=reports.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<div class="field-report-card"><div class="project-meta"><span>${esc(r.date)}</span><span>${r.hours} hrs</span></div><h3>${esc(r.project)}</h3><small>${esc(r.crewName)} · Submitted by ${esc(r.submittedBy)}</small><p><strong>Production:</strong> ${esc(r.production)}</p><p><strong>Weather:</strong> ${esc(r.weather)}</p><p><strong>Safety:</strong> ${esc(r.safety)}</p><p><strong>Issues:</strong> ${esc(r.issues||"None")}</p><div class="project-meta"><span>${r.photos||0} photos</span><span>${r.equipmentReady?"Equipment ready":"Equipment issue"} · ${r.suppliesReady?"Supplies ready":"Supply issue"}</span></div></div>`).join("");
@@ -494,6 +523,7 @@ function renderFieldOperations(){
 }
 
 function renderMission(){
+  if(isMarine && window.AtlasMarine?.renderMission) return window.AtlasMarine.renderMission(marineContext());
   const projects=companyRows("projects"),schedule=companyRows("schedule"),materials=companyRows("materials");
   const risk=projects.filter(p=>["At Risk","Shop Drawings"].includes(p.status));
   const unassigned=schedule.filter(x=>!x.crewId),critical=materials.filter(m=>m.urgency==="Critical"&&m.status!=="Delivered"),conflicts=findConflicts();
@@ -507,6 +537,7 @@ function renderMission(){
   $("missionAttention").innerHTML=attention.length?attention.map(x=>`<div class="list-row"><div><strong>${esc(x.title)}</strong><small>${esc(x.detail)}</small></div></div>`).join(""):'<div class="empty">Operations are clear.</div>';
 }
 function renderProjects(){
+  if(isMarine && window.AtlasMarine?.renderProjects) return window.AtlasMarine.renderProjects(marineContext());
   const projects=companyRows("projects");
   const pms=[...new Set(projects.map(p=>p.pmName))].sort(),statuses=[...new Set(projects.map(p=>p.status))].sort();
   const pmValue=$("projectPmFilter").value,statusValue=$("projectStatusFilter").value;
@@ -528,13 +559,16 @@ function renderScheduler(){
   }).join("");
 }
 function renderCrews(){
+  if(isMarine && window.AtlasMarine?.renderCrews) return window.AtlasMarine.renderCrews(marineContext());
   const schedule=companyRows("schedule"),today=iso(new Date());
   $("crewList").innerHTML=companyRows("crews").map(c=>{const job=schedule.find(x=>x.date===today&&x.crewId===c.id);return `<article class="crew-card"><div class="project-meta"><span class="badge">${job?"Working":"Available"}</span><span>${esc(c.vehicle)}</span></div><h3>${esc(c.name)}</h3><small>Lead: ${esc(c.lead)}</small><div class="crew-members">${c.members.map(m=>`<span>${esc(m)}</span>`).join("")}</div><small><b>Equipment:</b> ${esc(c.equipment.join(", "))}</small>${job?`<small><b>Today:</b> ${esc(job.project)}</small>`:""}</article>`}).join("");
 }
 function renderMaterials(){
+  if(isMarine && window.AtlasMarine?.renderMaterials) return window.AtlasMarine.renderMaterials(marineContext());
   $("materialList").innerHTML=companyRows("materials").map(m=>`<div class="list-row"><div><strong>${esc(m.project)}</strong><small>${esc(m.items)}</small></div><div><span class="badge">${esc(m.urgency)}</span><small>${esc(m.status)}</small></div></div>`).join("");
 }
 function renderFinance(){
+  if(isMarine && window.AtlasMarine?.renderFinance) return window.AtlasMarine.renderFinance(marineContext());
   const projects=companyRows("projects"),bids=projects.filter(p=>p.status==="Bid"),contracts=projects.filter(p=>p.status!=="Bid");
   const contract=contracts.reduce((s,p)=>s+p.contractValue,0),paid=contracts.reduce((s,p)=>s+p.paidAmount,0),owed=contract-paid;
   $("fContract").textContent=money(contract);$("fPaid").textContent=money(paid);$("fOutstanding").textContent=money(owed);$("fPipeline").textContent=money(bids.reduce((s,p)=>s+p.contractValue,0));
@@ -590,6 +624,10 @@ function inviteUserDialog(){
 }
 function projectDialog(){
   const pms=state.users.filter(u=>u.companyId===currentCompanyId&&u.role==="project_manager");
+  if(isMarine){
+    openDialog({mode:"project",title:"Add Hull",eyebrow:"HULL REGISTRY",html:`<label>Hull ID<input name="name" placeholder="B39-028" required></label><label>Model<select name="model"><option>28CC</option><option>34CC</option><option>39CC</option><option>35 Flybridge</option><option>50 Sport</option><option>61 Convertible</option></select></label><label class="wide">Dealer / Customer<input name="customer" placeholder="Dealer or customer"></label><label>Production Location<input name="location" value="Tampa"></label><label class="wide">Configuration Summary<input name="scope" placeholder="Engine package, finish, major options"></label><label>Production Manager<select name="pmId">${pms.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label>Current Stage<select name="status"><option>Engineering Release</option><option>Lamination</option><option>Assembly</option><option>Mechanical</option><option>Electrical</option><option>Interior</option><option>Final Finish</option><option>Final QA</option></select></label><label>Target Delivery<input name="targetDelivery" type="date"></label><label>Build Budget<input name="contractValue" type="number" min="0"></label>`});
+    return;
+  }
   openDialog({mode:"project",title:"Add Project",eyebrow:"PROJECTS",html:`<label class="wide">Project Name<input name="name" required></label><label>Location<input name="location" required></label><label>Customer<input name="customer" required></label><label>Scope<input name="scope" required></label><label>Project Manager<select name="pmId">${pms.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label>Status<select name="status"><option>Active</option><option>Bid</option><option>Shop Drawings</option><option>Materials</option><option>Scheduled</option><option>At Risk</option></select></label><label>Contract Value<input name="contractValue" type="number" min="0"></label>`});
 }
 
@@ -599,14 +637,24 @@ function estimateDialog(){
 }
 function fieldReportDialog(){
   const crews=companyRows("crews"),projects=companyRows("projects").filter(p=>p.status!=="Bid");
+  if(isMarine){
+    openDialog({mode:"fieldReport",title:"Update Work Package",eyebrow:"WORK PACKAGES",html:`<label>Date<input name="date" type="date" value="${iso(new Date())}" required></label><label>Production Team<select name="crewId">${crews.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label class="wide">Hull<select name="projectId">${projects.map(p=>`<option value="${p.id}">${esc(p.name)} · ${esc(p.model||"")}</option>`).join("")}</select></label><label class="wide">Work Package / Progress<textarea name="production" required placeholder="WP number, operation, and percent complete"></textarea></label><label>Labor Hours<input name="hours" type="number" step="0.5" min="0"></label><label>Photos<input name="photos" type="number" min="0" value="0"></label><label class="wide">Work Center Notes<input name="weather" value="Indoor production"></label><label class="wide">Safety / Quality Notes<textarea name="safety"></textarea></label><label>Tools<select name="equipmentReady"><option value="true">Ready</option><option value="false">Issue</option></select></label><label>Materials<select name="suppliesReady"><option value="true">Ready</option><option value="false">Blocked</option></select></label><label class="wide">Blockers<textarea name="issues">None</textarea></label>`});
+    return;
+  }
   openDialog({mode:"fieldReport",title:"Daily Field Report",eyebrow:"FIELD OPERATIONS",html:`<label>Date<input name="date" type="date" value="${iso(new Date())}" required></label><label>Crew<select name="crewId">${crews.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label class="wide">Project<select name="projectId">${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label class="wide">Production Completed<textarea name="production" required></textarea></label><label>Hours<input name="hours" type="number" step="0.5" min="0"></label><label>Photos<input name="photos" type="number" min="0" value="0"></label><label class="wide">Weather<input name="weather"></label><label class="wide">Safety Notes<textarea name="safety"></textarea></label><label>Equipment<select name="equipmentReady"><option value="true">Ready</option><option value="false">Issue</option></select></label><label>Supplies<select name="suppliesReady"><option value="true">Ready</option><option value="false">Issue</option></select></label><label class="wide">Issues<textarea name="issues">None</textarea></label>`});
 }
 function scheduleDialog(){
   const projects=companyRows("projects").filter(p=>p.status!=="Bid"),crews=companyRows("crews");
   openDialog({mode:"schedule",title:"Schedule Work",eyebrow:"OPERATIONS SCHEDULER",html:`<label class="wide">Project<select name="projectId">${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label><label>Crew<select name="crewId">${crews.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select></label><label>Start Date<input name="startDate" type="date" value="${iso(new Date())}" required></label><label>End Date<input name="endDate" type="date" value="${iso(new Date())}" required></label><label>Start Time<input name="start" type="time" value="07:00"></label><label>End Time<input name="end" type="time" value="15:30"></label><label>Slot Color<select name="color"><option value="">No color</option><option value="red">Red</option><option value="blue">Blue</option><option value="green">Green</option></select></label><div class="wide"><strong>Days</strong><div class="button-row">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((x,i)=>`<label><input type="checkbox" name="weekday" value="${i}" ${i<5?"checked":""}> ${x}</label>`).join("")}</div></div>`});
 }
-function crewDialog(){openDialog({mode:"crew",title:"Create Crew",eyebrow:"CREW OPERATIONS",html:`<label>Crew Name<input name="name" required></label><label>Lead<input name="lead" required></label><label>Vehicle<input name="vehicle"></label><label class="wide">Members (comma-separated)<textarea name="members"></textarea></label><label class="wide">Equipment (comma-separated)<textarea name="equipment"></textarea></label>`});}
-function materialDialog(){openDialog({mode:"material",title:"Material Request",eyebrow:"PROCUREMENT",html:`<label class="wide">Project<select name="project">${companyRows("projects").map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></label><label class="wide">Items<textarea name="items" required></textarea></label><label>Urgency<select name="urgency"><option>Normal</option><option>High</option><option>Critical</option></select></label><label>Status<select name="status"><option>Open</option><option>Approved</option><option>Ordered</option><option>Delivered</option></select></label>`});}
+function crewDialog(){
+  if(isMarine){openDialog({mode:"crew",title:"Create Production Team",eyebrow:"WORK CENTERS",html:`<label>Team / Work Center<input name="name" required></label><label>Lead<input name="lead" required></label><label>Station / Bay<input name="vehicle"></label><label class="wide">Team Members (comma-separated)<textarea name="members"></textarea></label><label class="wide">Tools / Equipment (comma-separated)<textarea name="equipment"></textarea></label>`});return;}
+  openDialog({mode:"crew",title:"Create Crew",eyebrow:"CREW OPERATIONS",html:`<label>Crew Name<input name="name" required></label><label>Lead<input name="lead" required></label><label>Vehicle<input name="vehicle"></label><label class="wide">Members (comma-separated)<textarea name="members"></textarea></label><label class="wide">Equipment (comma-separated)<textarea name="equipment"></textarea></label>`});
+}
+function materialDialog(){
+  if(isMarine){openDialog({mode:"material",title:"Material / Purchasing Exception",eyebrow:"SUPPLY CHAIN",html:`<label class="wide">Hull<select name="project">${companyRows("projects").map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></label><label>Part Number<input name="partNumber"></label><label>Supplier<input name="supplier"></label><label class="wide">Item / Kit<textarea name="items" required></textarea></label><label>Urgency<select name="urgency"><option>Normal</option><option>High</option><option>Critical</option></select></label><label>Status<select name="status"><option>Awaiting Confirmation</option><option>Ordered</option><option>In Transit</option><option>Staged</option><option>Delivered</option><option>Delayed</option></select></label><label>Required On Line<input name="requiredDate" type="date"></label><label>ETA<input name="eta"></label><label class="wide">Production Impact<textarea name="impact"></textarea></label>`});return;}
+  openDialog({mode:"material",title:"Material Request",eyebrow:"PROCUREMENT",html:`<label class="wide">Project<select name="project">${companyRows("projects").map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></label><label class="wide">Items<textarea name="items" required></textarea></label><label>Urgency<select name="urgency"><option>Normal</option><option>High</option><option>Critical</option></select></label><label>Status<select name="status"><option>Open</option><option>Approved</option><option>Ordered</option><option>Delivered</option></select></label>`});
+}
 
 async function createCloudUser(payload){
   const {data,error}=await supabase.functions.invoke("atlas-admin-users",{body:{action:"invite",company_id:currentCompanyId,...payload,redirect_to:`${location.origin}${location.pathname}?atlas_auth=invite`}});
@@ -652,7 +700,9 @@ async function saveRecord(event){
     }
     if(mode==="project"){
       const pm=state.users.find(u=>u.id===fd.get("pmId"));
-      state.projects.push({id:uid(),companyId:currentCompanyId,name:fd.get("name"),location:fd.get("location"),customer:fd.get("customer"),scope:fd.get("scope"),pmId:pm.id,pmName:pm.name,status:fd.get("status"),progress:0,contractValue:Number(fd.get("contractValue")||0),paidAmount:0,startDate:iso(new Date()),color:""});
+      const record={id:uid(),companyId:currentCompanyId,name:fd.get("name"),location:fd.get("location"),customer:fd.get("customer"),scope:fd.get("scope"),pmId:pm.id,pmName:pm.name,status:fd.get("status"),progress:0,contractValue:Number(fd.get("contractValue")||0),paidAmount:0,startDate:iso(new Date()),color:""};
+      if(isMarine) Object.assign(record,{model:fd.get("model"),targetDelivery:fd.get("targetDelivery"),materialReadiness:0,qaOpen:0,risk:"On Schedule",configRev:"A",stage:fd.get("status")});
+      state.projects.push(record);
       saveState();$("recordDialog").close();renderAll();
     }
     if(mode==="crew"){
@@ -660,7 +710,9 @@ async function saveRecord(event){
       saveState();$("recordDialog").close();renderAll();
     }
     if(mode==="material"){
-      state.materials.push({id:uid(),companyId:currentCompanyId,project:fd.get("project"),items:fd.get("items"),urgency:fd.get("urgency"),status:fd.get("status")});
+      const record={id:uid(),companyId:currentCompanyId,project:fd.get("project"),items:fd.get("items"),urgency:fd.get("urgency"),status:fd.get("status")};
+      if(isMarine) Object.assign(record,{partNumber:fd.get("partNumber"),supplier:fd.get("supplier"),requiredDate:fd.get("requiredDate"),eta:fd.get("eta"),impact:fd.get("impact")});
+      state.materials.push(record);
       saveState();$("recordDialog").close();renderAll();
     }
     if(mode==="schedule"){
@@ -746,7 +798,7 @@ window.addEventListener("error",event=>{
 if("serviceWorker" in navigator)navigator.serviceWorker.register("service-worker.js").catch(console.warn);
 
 (async()=>{
-  $("environmentBadge").textContent=cfg.environment==="production"?"PRODUCTION":"LOCAL / DEMO READY";
+  $("environmentBadge").textContent=isMarine?(vertical.environmentLabel||"BERTRAM DEMONSTRATION ENVIRONMENT"):(cfg.environment==="production"?"PRODUCTION":"LOCAL / DEMO READY");
   if(cfg.environment==="production"&&!cfg.showDemoLogin)$("demoLogin").classList.add("hidden");
   if(!supabase)return;
   const {data:{user}}=await supabase.auth.getUser();

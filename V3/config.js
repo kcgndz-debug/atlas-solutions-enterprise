@@ -3,5 +3,7 @@ window.ATLAS_CONFIG = {
   supabaseUrl: "https://hoiwyekhesluaqmtqkbs.supabase.co",
   supabaseAnonKey: "sb_publishable_gvvJkY5cpVBeN7tpq1_3pg_bwzdbAFX",
   environment: "development",
+  vertical: "marine",
+  tenant: "bertram-demo",
   showDemoLogin: true
 };

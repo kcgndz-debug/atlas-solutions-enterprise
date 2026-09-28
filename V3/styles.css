@@ -75,3 +75,239 @@ dialog{width:min(720px,calc(100vw - 30px));border:0;border-radius:18px;padding:2
 .athena-tour-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:24px;background:rgba(15,23,42,.35);pointer-events:none}.athena-tour-card{width:min(680px,100%);padding:18px;border-radius:18px;background:#fff;box-shadow:0 30px 80px rgba(15,23,42,.35);pointer-events:auto}.athena-tour-head{display:flex;align-items:center;gap:11px}.athena-tour-head h3{margin:3px 0}.athena-tour-progress{height:7px;margin-top:14px;border-radius:999px;background:#e2e8f0;overflow:hidden}.athena-tour-progress span{display:block;height:100%;background:linear-gradient(90deg,#2c96cd,#173451)}
 @media(max-width:900px){.estimate-builder{grid-template-columns:1fr}.estimate-breakdown{grid-template-columns:1fr 1fr}.athena-guide-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.estimate-result-hero,.estimate-breakdown{grid-template-columns:1fr}.athena-chat-form{flex-direction:column}}
+
+
+/* Atlas Marine vertical */
+html[data-atlas-vertical="marine"] .environment-badge{
+  letter-spacing:.08em;
+}
+html[data-atlas-vertical="marine"] .marine-hull-card{
+  min-height:245px;
+}
+html[data-atlas-vertical="marine"] .marine-stat-row{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:14px 0;
+}
+html[data-atlas-vertical="marine"] .marine-stat-row span{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:8px 10px;
+  border:1px solid var(--line,#d9e1e8);
+  border-radius:10px;
+  background:rgba(255,255,255,.5);
+  font-size:.75rem;
+}
+html[data-atlas-vertical="marine"] .marine-stat-row b{
+  font-size:.9rem;
+}
+html[data-atlas-vertical="marine"] .marine-material-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:18px;
+  align-items:start;
+  padding:16px 0;
+  border-bottom:1px solid var(--line,#d9e1e8);
+}
+html[data-atlas-vertical="marine"] .marine-material-row:last-child{
+  border-bottom:0;
+}
+html[data-atlas-vertical="marine"] .marine-material-row > div{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+html[data-atlas-vertical="marine"] .pattern-alert{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:18px;
+  border-radius:14px;
+  border:1px solid #d8a62a;
+  background:rgba(216,166,42,.08);
+}
+html[data-atlas-vertical="marine"] #engineering table,
+html[data-atlas-vertical="marine"] #quality table,
+html[data-atlas-vertical="marine"] #warranty table{
+  min-width:980px;
+}
+html[data-atlas-vertical="marine"] #dashboard .panel.hidden{
+  display:none;
+}
+@media (max-width:800px){
+  html[data-atlas-vertical="marine"] .marine-stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  html[data-atlas-vertical="marine"] .marine-material-row{grid-template-columns:1fr}
+}
+
+
+/* Atlas Marine ERP expansion */
+html[data-atlas-vertical="marine"] .action-center-grid,
+html[data-atlas-vertical="marine"] .scenario-grid,
+html[data-atlas-vertical="marine"] .supplier-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+html[data-atlas-vertical="marine"] .action-card,
+html[data-atlas-vertical="marine"] .scenario-card{
+  display:grid;
+  gap:8px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:linear-gradient(145deg,#fff,#f6f9fb);
+  color:var(--ink);
+  text-align:left;
+}
+html[data-atlas-vertical="marine"] .action-card>div{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+html[data-atlas-vertical="marine"] .scenario-card:hover{
+  border-color:#93bfd8;
+  transform:translateY(-1px);
+}
+html[data-atlas-vertical="marine"] .scenario-card span{
+  color:var(--navy);
+  font-size:.78rem;
+  font-weight:800;
+}
+html[data-atlas-vertical="marine"] .supplier-grid{
+  margin-bottom:18px;
+}
+html[data-atlas-vertical="marine"] .digital-thread{
+  display:grid;
+  gap:0;
+}
+html[data-atlas-vertical="marine"] .thread-event{
+  display:grid;
+  grid-template-columns:72px 1fr;
+  gap:16px;
+  position:relative;
+  padding:14px 0;
+  border-bottom:1px solid #e8edf1;
+}
+html[data-atlas-vertical="marine"] .thread-event:last-child{
+  border-bottom:0;
+}
+html[data-atlas-vertical="marine"] .thread-event>span{
+  font-weight:900;
+  color:var(--blue);
+}
+html[data-atlas-vertical="marine"] .thread-event>div{
+  display:grid;
+  gap:4px;
+}
+html[data-atlas-vertical="marine"] .thread-event small{
+  color:var(--muted);
+}
+html[data-atlas-vertical="marine"] .impact-flow{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+html[data-atlas-vertical="marine"] .impact-flow span{
+  padding:8px 10px;
+  border-radius:999px;
+  background:#e8f2f8;
+  color:var(--navy);
+  font-size:.74rem;
+  font-weight:900;
+}
+html[data-atlas-vertical="marine"] .impact-flow b{
+  color:var(--blue);
+}
+html[data-atlas-vertical="marine"] #orders table,
+html[data-atlas-vertical="marine"] #planning table,
+html[data-atlas-vertical="marine"] #inventory table,
+html[data-atlas-vertical="marine"] #materials table,
+html[data-atlas-vertical="marine"] #finance table{
+  min-width:1100px;
+}
+html[data-atlas-vertical="marine"] #mainNav{
+  scrollbar-width:thin;
+}
+@media(max-width:1000px){
+  html[data-atlas-vertical="marine"] .action-center-grid,
+  html[data-atlas-vertical="marine"] .scenario-grid,
+  html[data-atlas-vertical="marine"] .supplier-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:700px){
+  html[data-atlas-vertical="marine"] .action-center-grid,
+  html[data-atlas-vertical="marine"] .scenario-grid,
+  html[data-atlas-vertical="marine"] .supplier-grid{
+    grid-template-columns:1fr;
+  }
+  html[data-atlas-vertical="marine"] .thread-event{
+    grid-template-columns:58px 1fr;
+  }
+}
+
+html[data-atlas-vertical="marine"] .capacity-board{display:grid;gap:12px}
+html[data-atlas-vertical="marine"] .capacity-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:12px 0;border-bottom:1px solid #e8edf1}
+html[data-atlas-vertical="marine"] .capacity-row:last-child{border-bottom:0}
+html[data-atlas-vertical="marine"] .capacity-row>div:first-child{display:grid;gap:3px}
+html[data-atlas-vertical="marine"] .capacity-row>div:nth-child(2){display:flex;align-items:center;gap:8px}
+html[data-atlas-vertical="marine"] .capacity-row .progress{grid-column:1/-1}
+html[data-atlas-vertical="marine"] #marineQualityPlanningExt table{min-width:1100px}
+
+
+/* Atlas Marine build material planner */
+html[data-atlas-vertical="marine"] .inventory-planner-head{
+  align-items:end;
+}
+html[data-atlas-vertical="marine"] .inventory-plan-controls{
+  display:flex;
+  gap:10px;
+  align-items:end;
+  flex-wrap:wrap;
+}
+html[data-atlas-vertical="marine"] .inventory-plan-controls label{
+  min-width:220px;
+}
+html[data-atlas-vertical="marine"] .build-plan-summary{
+  margin-top:16px;
+}
+html[data-atlas-vertical="marine"] .inventory-readiness-bar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  margin:8px 0 16px;
+}
+html[data-atlas-vertical="marine"] .build-material-table{
+  min-width:1250px;
+}
+html[data-atlas-vertical="marine"] .inventory-plan-lower{
+  margin-top:16px;
+}
+html[data-atlas-vertical="marine"] .model-inventory-button{
+  margin-top:12px;
+  width:100%;
+}
+html[data-atlas-vertical="marine"] .inventory-status.in-stock{
+  background:#e8f4ec;
+}
+html[data-atlas-vertical="marine"] .inventory-status.incoming-po{
+  background:#fff4d9;
+}
+html[data-atlas-vertical="marine"] .inventory-status.needs-order{
+  background:#fde8e8;
+}
+@media(max-width:700px){
+  html[data-atlas-vertical="marine"] .inventory-plan-controls{
+    display:grid;
+    grid-template-columns:1fr;
+    width:100%;
+  }
+  html[data-atlas-vertical="marine"] .inventory-plan-controls label{
+    min-width:0;
+  }
+}
