@@ -112,7 +112,8 @@
   };
 
   function analyze(model, state){
-    const bom=(state.modelBoms||[]).find(b=>b.companyId===companyId&&b.model===model);
+    const sourceBoms=(state.modelBoms&&state.modelBoms.length)?state.modelBoms:boms;
+    const bom=sourceBoms.find(b=>b.companyId===companyId&&b.model===model);
     if(!bom) return {bom:null,rows:[]};
     const inv=(state.inventory||[]).filter(i=>i.companyId===companyId);
     const rows=bom.lines.map(line=>{
@@ -137,6 +138,11 @@
     priorExtra(ctx);
     const inventory=document.getElementById("inventory");
     if(!inventory) return;
+
+    if(!ctx.state.modelBoms?.length) ctx.state.modelBoms=boms;
+    ctx.state.inventory=ctx.state.inventory||[];
+    const existingParts=new Set(ctx.state.inventory.filter(i=>i.companyId===ctx.currentCompanyId).map(i=>i.part));
+    moreInventory.forEach(item=>{if(!existingParts.has(item.part))ctx.state.inventory.push({...item});});
 
     const models=(ctx.state.modelBoms||[]).filter(b=>b.companyId===ctx.currentCompanyId);
     let selected=inventory.dataset.planModel || models[0]?.model || "39CC";
@@ -245,6 +251,18 @@
 
     const modelsSection=document.getElementById("models");
     if(modelsSection){
+      const modelRows=(ctx.state.models||[]).filter(m=>m.companyId===ctx.currentCompanyId);
+      modelsSection.querySelectorAll(".project-card").forEach((card,index)=>{
+        const model=modelRows[index]?.name;
+        if(model && !card.querySelector("[data-plan-model]")){
+          const btn=document.createElement("button");
+          btn.type="button";
+          btn.className="secondary model-inventory-button";
+          btn.dataset.planModel=model;
+          btn.textContent="Check Inventory";
+          card.appendChild(btn);
+        }
+      });
       modelsSection.querySelectorAll("[data-plan-model]").forEach(btn=>{
         btn.onclick=()=>{
           inventory.dataset.planModel=btn.dataset.planModel;
@@ -277,5 +295,4 @@
     if(button) button.textContent="Inventory & Build Planning";
   };
 
-  const priorModelRender = base.renderExtraViews;
 })();
