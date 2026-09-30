@@ -1,3 +1,6 @@
 /marine /marine/index.html 200
 /marine/ /marine/index.html 200
 /marine/* /marine/index.html 200
+/avt /avt/index.html 200
+/avt/ /avt/index.html 200
+/avt/* /avt/index.html 200
