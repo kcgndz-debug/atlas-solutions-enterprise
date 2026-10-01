@@ -2,9 +2,37 @@ https://atlasverticaltechnologies.com/ /avt/index.html 200!
 https://www.atlasverticaltechnologies.com/ /avt/index.html 200!
 
 https://demo.atlasverticaltechnologies.com/ /demo/index.html 200!
-https://demo.atlasverticaltechnologies.com/delamere /index.html 200!
-https://demo.atlasverticaltechnologies.com/delamere/ /index.html 200!
-https://demo.atlasverticaltechnologies.com/delamere/* /:splat 200!
+https://demo.atlasverticaltechnologies.com/index.html /demo/index.html 200!
+https://demo.atlasverticaltechnologies.com/railing /demo/railing/index.html 200!
+https://demo.atlasverticaltechnologies.com/railing/ /demo/railing/index.html 200!
+https://demo.atlasverticaltechnologies.com/electrical /demo/electrical/index.html 200!
+https://demo.atlasverticaltechnologies.com/electrical/ /demo/electrical/index.html 200!
+https://demo.atlasverticaltechnologies.com/security /demo/security/index.html 200!
+https://demo.atlasverticaltechnologies.com/security/ /demo/security/index.html 200!
+https://demo.atlasverticaltechnologies.com/marine /demo/marine/index.html 200!
+https://demo.atlasverticaltechnologies.com/marine/ /demo/marine/index.html 200!
+https://demo.atlasverticaltechnologies.com/forge /demo/forge/index.html 200!
+https://demo.atlasverticaltechnologies.com/forge/ /demo/forge/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo /demo/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo/ /demo/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo/railing/* /demo/railing/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo/electrical/* /demo/electrical/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo/security/* /demo/security/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo/marine/* /demo/marine/index.html 200!
+https://demo.atlasverticaltechnologies.com/demo/forge/* /demo/forge/index.html 200!
+
+/demo /demo/index.html 200
+/demo/ /demo/index.html 200
+/demo/railing /demo/railing/index.html 200
+/demo/railing/ /demo/railing/index.html 200
+/demo/electrical /demo/electrical/index.html 200
+/demo/electrical/ /demo/electrical/index.html 200
+/demo/security /demo/security/index.html 200
+/demo/security/ /demo/security/index.html 200
+/demo/marine /demo/marine/index.html 200
+/demo/marine/ /demo/marine/index.html 200
+/demo/forge /demo/forge/index.html 200
+/demo/forge/ /demo/forge/index.html 200
 
 /marine /marine/index.html 200
 /marine/ /marine/index.html 200
@@ -12,5 +40,3 @@ https://demo.atlasverticaltechnologies.com/delamere/* /:splat 200!
 /avt /avt/index.html 200
 /avt/ /avt/index.html 200
 /avt/* /avt/index.html 200
-/demo /demo/index.html 200
-/demo/ /demo/index.html 200
