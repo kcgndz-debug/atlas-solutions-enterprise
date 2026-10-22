@@ -1,7 +1,8 @@
-const CACHE_NAME = "atlas-v3-build-11-rbac-20260727";
+const CACHE_NAME = "atlas-v3-build-11-rbac-20261022-angle";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./field-angle-finder.html",
   "./styles.css",
   "./app.js",
   "./js/modules/supabase-client.js",
@@ -39,10 +40,10 @@ self.addEventListener("fetch", (event) => {
       fetch(event.request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+          if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
           return response;
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(async () => (await caches.match(event.request)) || caches.match("./index.html"))
     );
     return;
   }
